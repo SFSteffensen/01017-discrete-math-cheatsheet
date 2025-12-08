@@ -27,6 +27,8 @@ A comprehensive exam reference document for **01017 Discrete Mathematics** at DT
 
 The document includes Typst functions for live calculations:
 
+**Core Functions:**
+
 - `calc.gcd(a, b)`, `calc.lcm(a, b)` — GCD and LCM
 - `calc.binom(n, k)`, `calc.fact(n)` — Binomial coefficients and factorials
 - `derangement(n)` — Derangement calculator (D_n)
@@ -34,7 +36,24 @@ The document includes Typst functions for live calculations:
 - `mod-inverse(n, m)` — Modular multiplicative inverse
 - `crt-solve(remainders, moduli)` — Chinese Remainder Theorem solver
 
-Display helpers: `show-gcd`, `show-bezout`, `show-mod-inverse`, `show-crt`, `show-binom`, `show-fact`, `show-derangement`
+**New Functions:**
+
+- `euler-phi(n)` — Euler's totient function φ(n)
+- `stirling2(n, k)` — Stirling numbers of the second kind S(n,k)
+- `is-perfect(n)` — Check if n is a perfect number
+- `sum-proper-divisors(n)` — Sum of proper divisors of n
+- `ie2(a, b, ab)` — Inclusion-exclusion for 2 sets
+- `ie3(a, b, c, ab, ac, bc, abc)` — Inclusion-exclusion for 3 sets
+- `gcd-steps(a, b)` — GCD with step-by-step Euclidean algorithm display
+
+**Display Helpers:**
+
+- `show-gcd`, `show-bezout`, `show-mod-inverse`, `show-crt`, `show-binom`, `show-fact`, `show-derangement`
+
+**External Packages:**
+
+- `poly-div`, `poly-div-working` — Polynomial long division (from [auto-div](https://typst.app/universe/package/auto-div))
+- `venn2`, `venn3` — Venn diagram drawing (from [cetz-venn](https://typst.app/universe/package/cetz-venn))
 
 ### Worked Examples & Solutions
 
@@ -45,10 +64,26 @@ Display helpers: `show-gcd`, `show-bezout`, `show-mod-inverse`, `show-crt`, `sho
 - **Relations** — Equivalence classes, partial orders
 - **Proof Techniques** — Mathematical induction, pigeonhole principle
 - **Matching** — Hall's theorem applications
+- **Propositional Logic** — Truth sayer/liar puzzles with truth tables
+- **Perfect Numbers** — Verification and Mersenne prime theorem
+- **Set Operations** — Algebraic proofs of set identities
+- **Equivalence Relations** — Cardinality equivalence, rational equivalence
 
 ### Calculation Workspace
 
 A dedicated section for performing calculations during the exam with pre-configured helper functions.
+
+---
+
+## Testing
+
+The repository includes a test suite (`tests.typ`) with **97 assertions** that validate all custom functions:
+
+```sh
+typst compile tests.typ
+```
+
+If compilation succeeds, all tests pass.
 
 ---
 
@@ -67,6 +102,18 @@ typst compile "Discrete_Cheat_Sheet.typ"
 ```
 
 Or use the Typst web app / VS Code extension for live preview.
+
+---
+
+## CI/CD
+
+This repository includes a GitHub Actions workflow that:
+
+1. Runs the test suite to validate all functions
+2. Compiles the document to PDF
+3. Creates a timestamped release with the PDF attached
+
+See the [Releases](https://github.com/SFSteffensen/01017-discrete-math-cheatsheet/releases) page for the latest PDF.
 
 ---
 

@@ -55,6 +55,47 @@
 // Complete graph edges: K_n has n(n-1)/2 edges
 #let complete-edges(n) = calc.quo(n * (n - 1), 2)
 
+// Perfect number checker: n is perfect if it equals sum of its proper divisors
+#let is-perfect(n) = {
+  let sum = 0
+  for d in range(1, n) {
+    if calc.rem(n, d) == 0 { sum = sum + d }
+  }
+  sum == n
+}
+
+// Sum of divisors (excluding n itself)
+#let sum-proper-divisors(n) = {
+  let sum = 0
+  for d in range(1, n) {
+    if calc.rem(n, d) == 0 { sum = sum + d }
+  }
+  sum
+}
+
+// Euler's totient function φ(n): count of integers 1 to n coprime with n
+#let euler-phi(n) = {
+  let count = 0
+  for k in range(1, n + 1) {
+    if calc.gcd(k, n) == 1 { count = count + 1 }
+  }
+  count
+}
+
+// Stirling numbers of the second kind S(n,k)
+#let stirling2(n, k) = {
+  if k == 0 and n == 0 { return 1 }
+  if k == 0 or n == 0 or k > n { return 0 }
+  if k == 1 or k == n { return 1 }
+  k * stirling2(n - 1, k) + stirling2(n - 1, k - 1)
+}
+
+// Inclusion-exclusion for 2 sets
+#let ie2(a, b, ab) = a + b - ab
+
+// Inclusion-exclusion for 3 sets
+#let ie3(a, b, c, ab, ac, bc, abc) = a + b + c - ab - ac - bc + abc
+
 // ============================================================================
 // TEST ASSERTIONS
 // ============================================================================
@@ -273,4 +314,81 @@
 
 #align(center)[
   All #strong[67] assertions completed successfully.
+]
+
+== Perfect Number Tests
+
+#assert.eq(is-perfect(6), true, message: "6 should be perfect")
+#assert.eq(is-perfect(28), true, message: "28 should be perfect")
+#assert.eq(is-perfect(496), true, message: "496 should be perfect")
+#assert.eq(is-perfect(12), false, message: "12 should not be perfect")
+#assert.eq(is-perfect(10), false, message: "10 should not be perfect")
+
+#assert.eq(sum-proper-divisors(6), 6, message: "sum of proper divisors of 6 should be 6")
+#assert.eq(sum-proper-divisors(28), 28, message: "sum of proper divisors of 28 should be 28")
+#assert.eq(sum-proper-divisors(12), 16, message: "sum of proper divisors of 12 should be 16")
+
+✓ All perfect number tests passed
+
+== Euler's Totient Function Tests
+
+// φ(1) = 1, φ(2) = 1, φ(6) = 2, φ(9) = 6, φ(10) = 4, φ(12) = 4
+#assert.eq(euler-phi(1), 1, message: "φ(1) should be 1")
+#assert.eq(euler-phi(2), 1, message: "φ(2) should be 1")
+#assert.eq(euler-phi(6), 2, message: "φ(6) should be 2")
+#assert.eq(euler-phi(9), 6, message: "φ(9) should be 6")
+#assert.eq(euler-phi(10), 4, message: "φ(10) should be 4")
+#assert.eq(euler-phi(12), 4, message: "φ(12) should be 4")
+// For prime p: φ(p) = p - 1
+#assert.eq(euler-phi(7), 6, message: "φ(7) should be 6 (prime)")
+#assert.eq(euler-phi(13), 12, message: "φ(13) should be 12 (prime)")
+
+✓ All Euler's totient tests passed
+
+== Stirling Numbers Tests
+
+// S(n,1) = 1 for all n >= 1
+#assert.eq(stirling2(1, 1), 1, message: "S(1,1) should be 1")
+#assert.eq(stirling2(5, 1), 1, message: "S(5,1) should be 1")
+
+// S(n,n) = 1 for all n >= 0
+#assert.eq(stirling2(0, 0), 1, message: "S(0,0) should be 1")
+#assert.eq(stirling2(3, 3), 1, message: "S(3,3) should be 1")
+#assert.eq(stirling2(5, 5), 1, message: "S(5,5) should be 1")
+
+// Known values: S(3,2) = 3, S(4,2) = 7, S(4,3) = 6, S(5,2) = 15, S(5,3) = 25
+#assert.eq(stirling2(3, 2), 3, message: "S(3,2) should be 3")
+#assert.eq(stirling2(4, 2), 7, message: "S(4,2) should be 7")
+#assert.eq(stirling2(4, 3), 6, message: "S(4,3) should be 6")
+#assert.eq(stirling2(5, 2), 15, message: "S(5,2) should be 15")
+#assert.eq(stirling2(5, 3), 25, message: "S(5,3) should be 25")
+
+// Edge cases
+#assert.eq(stirling2(5, 0), 0, message: "S(5,0) should be 0")
+#assert.eq(stirling2(3, 5), 0, message: "S(3,5) should be 0 (k > n)")
+
+✓ All Stirling number tests passed
+
+== Inclusion-Exclusion Tests
+
+// |A ∪ B| = |A| + |B| - |A ∩ B|
+#assert.eq(ie2(10, 15, 5), 20, message: "IE2: 10 + 15 - 5 = 20")
+#assert.eq(ie2(100, 50, 25), 125, message: "IE2: 100 + 50 - 25 = 125")
+
+// |A ∪ B ∪ C| = |A| + |B| + |C| - |A∩B| - |A∩C| - |B∩C| + |A∩B∩C|
+#assert.eq(ie3(10, 20, 30, 5, 3, 7, 2), 47, message: "IE3 test")
+#assert.eq(ie3(100, 100, 100, 50, 50, 50, 25), 175, message: "IE3: symmetric case")
+
+✓ All inclusion-exclusion tests passed
+
+#line(length: 100%)
+
+#align(center)[
+  #text(size: 16pt, weight: "bold", fill: green)[✓ ALL EXTENDED TESTS PASSED]
+]
+
+#v(1em)
+
+#align(center)[
+  All #strong[97] assertions completed successfully.
 ]

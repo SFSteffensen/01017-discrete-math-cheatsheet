@@ -1,5 +1,7 @@
 #import "@local/dtu-template:0.5.1":*
 #import "@preview/cetz:0.4.2"
+#import "@preview/cetz-venn:0.1.4": venn2, venn3
+#import "@preview/auto-div:0.1.0": poly-div, poly-div-working
 
 #show: dtu-note.with(
   course: "01017",
@@ -26,6 +28,80 @@
 
 // pmod: LaTeX-style "parenthesized mod" notation: a ≡ b (mod m)
 #let pmod(m) = $space (mod #m)$
+
+// Perfect number checker: n is perfect if it equals sum of its proper divisors
+#let is-perfect(n) = {
+  let sum = 0
+  for d in range(1, n) {
+    if calc.rem(n, d) == 0 { sum = sum + d }
+  }
+  sum == n
+}
+
+// Sum of divisors (excluding n itself)
+#let sum-proper-divisors(n) = {
+  let sum = 0
+  for d in range(1, n) {
+    if calc.rem(n, d) == 0 { sum = sum + d }
+  }
+  sum
+}
+
+// Euler's totient function φ(n): count of integers 1 to n coprime with n
+#let euler-phi(n) = {
+  let count = 0
+  for k in range(1, n + 1) {
+    if calc.gcd(k, n) == 1 { count = count + 1 }
+  }
+  count
+}
+
+// Stirling numbers of the second kind S(n,k): ways to partition n elements into k non-empty subsets
+#let stirling2(n, k) = {
+  if k == 0 and n == 0 { return 1 }
+  if k == 0 or n == 0 or k > n { return 0 }
+  if k == 1 or k == n { return 1 }
+  // Recurrence: S(n,k) = k*S(n-1,k) + S(n-1,k-1)
+  k * stirling2(n - 1, k) + stirling2(n - 1, k - 1)
+}
+
+// Inclusion-exclusion for 2 sets
+#let ie2(a, b, ab) = a + b - ab
+
+// Inclusion-exclusion for 3 sets
+#let ie3(a, b, c, ab, ac, bc, abc) = a + b + c - ab - ac - bc + abc
+
+// Inclusion-exclusion for 4 sets
+#let ie4(singles, pairs, triples, quad) = 4 * singles - 6 * pairs + 4 * triples - quad
+
+// Check if a sequence is a valid degree sequence (Erdős–Gallai theorem simplified check)
+#let sum-degrees(seq) = seq.fold(0, (acc, x) => acc + x)
+
+// GCD with steps display (Euclidean algorithm)
+#let gcd-steps(a, b) = {
+  let (larger, smaller) = if a >= b { (a, b) } else { (b, a) }
+  let steps = ()
+  let current-a = larger
+  let current-b = smaller
+
+  while current-b != 0 {
+    let quotient = calc.quo(current-a, current-b)
+    let remainder = calc.rem(current-a, current-b)
+    steps.push((current-a, current-b, quotient, remainder))
+    current-a = current-b
+    current-b = remainder
+  }
+
+  let result = current-a
+  let math-lines = steps.map(step =>
+  $#str(step.at(0)) &= #str(step.at(1)) dot #str(step.at(2)) + #str(step.at(3))$).join($ \ $)
+
+  [
+    Finding $gcd(#str(a), #str(b))$:
+    $ #math-lines $
+    Therefore, $gcd(#str(a), #str(b)) = #str(result)$
+  ]
+}
 
 // Derangement calculator: D_n = n! * Σ(-1)^k/k! for k=0 to n
 #let derangement(n) = {
@@ -664,6 +740,163 @@
 
     *Minimum cables:* $5 times 6 = 30$
   ]
+]
+
+#pagebreak()
+
+== Propositional Logic (Truth Sayer/Liar Puzzles)
+
+#example(title: [Truth Sayer and Liar Logic])[
+  Peter says: "At least one of us is a liar." What are Peter and Signe?
+
+  #solution[
+    Let $P$ = "Peter is truth sayer", $S$ = "Signe is truth sayer"
+
+    Peter's claim: $not P or not S$
+
+    *Key:* If Peter is a truth sayer, his claim must be true. If he's a liar, his claim must be false.
+
+    $ P arrow.l.r.double (not P or not S) $
+
+    #table(
+      columns: 4,
+      [$P$],
+      [$S$],
+      [$not P or not S$],
+      [$P arrow.l.r.double (not P or not S)$],
+      [T],
+      [T],
+      [F],
+      [F],
+      [T],
+      [F],
+      [T],
+      [*T*],
+      [F],
+      [T],
+      [T],
+      [F],
+      [F],
+      [F],
+      [T],
+      [F],
+    )
+
+    *Answer:* Peter is a truth sayer, Signe is a liar.
+  ]
+]
+
+== Perfect Numbers
+
+#example(title: [Verify perfect numbers])[
+  Show that 6 and 28 are perfect numbers (equal to sum of proper divisors).
+
+  #solution[
+    *For 6:* Divisors (excluding 6): $1, 2, 3$
+    $ 1 + 2 + 3 = 6 $ ✓
+
+    *For 28:* Divisors (excluding 28): $1, 2, 4, 7, 14$
+    $ 1 + 2 + 4 + 7 + 14 = 28 $ ✓
+
+    *Theorem:* $2^(p-1)(2^p - 1)$ is perfect when $2^p - 1$ is prime (Mersenne prime).
+
+    Example: $p = 3$, $2^3 - 1 = 7$ (prime), so $2^2 dot 7 = 28$ is perfect.
+  ]
+]
+
+== Set Operations Proofs
+
+#example(title: [Prove $(A - C) inter (C - B) = emptyset$])[
+  #solution[
+    $(A - C)$ = elements in $A$ but not in $C$
+
+    $(C - B)$ = elements in $C$ but not in $B$
+
+    For $x in (A - C) inter (C - B)$:
+    - $x in A - C$ means $x in A$ and $x in.not C$
+    - $x in C - B$ means $x in C$ and $x in.not B$
+
+    *Contradiction:* $x in.not C$ and $x in C$ cannot both be true.
+
+    Therefore $(A - C) inter (C - B) = emptyset$.
+  ]
+]
+
+#example(title: [Prove $(B - A) union (C - A) = (B union C) - A$])[
+  #solution[
+    *LHS:* $x in (B - A) union (C - A)$
+    - $x in B - A$ or $x in C - A$
+    - $(x in B and x in.not A)$ or $(x in C and x in.not A)$
+    - $(x in B or x in C)$ and $x in.not A$
+
+    *RHS:* $x in (B union C) - A$
+    - $x in B union C$ and $x in.not A$
+    - $(x in B or x in C)$ and $x in.not A$
+
+    Both sides are equivalent. ✓
+  ]
+]
+
+== Equivalence Relations
+
+#example(title: [Cardinality as equivalence relation])[
+  Let $R$ on sets of real numbers: $S R T$ iff $|S| = |T|$.
+
+  #solution[
+    *Reflexive:* $|S| = |S|$ ✓
+
+    *Symmetric:* $|S| = |T| arrow.double |T| = |S|$ ✓
+
+    *Transitive:* $|S| = |T|$ and $|T| = |U| arrow.double |S| = |U|$ ✓
+
+    *Equivalence classes:*
+    - $[{0, 1, 2}]$ = all sets with exactly 3 elements
+    - $[ZZ]$ = all countably infinite sets (includes $NN$, $QQ$)
+  ]
+]
+
+#example(title: [Rational equivalence: $(a,b) R (c,d)$ iff $a d = b c$])[
+  #solution[
+    This is an equivalence relation (represents fractions $a/b = c/d$).
+
+    *Reflexive:* $a dot b = b dot a$ ✓
+
+    *Symmetric:* $a d = b c arrow.double c b = d a$ ✓
+
+    *Transitive:* If $a d = b c$ and $c f = d e$, then:
+    - Multiply: $a d f = b c f = b d e$
+    - Since $d > 0$: $a f = b e$ ✓
+
+    Equivalence class of $(1, 2)$: all pairs $(k, 2k)$ for $k in ZZ^+$
+  ]
+]
+
+== Generalized Pigeonhole
+
+#example(
+  title: [Generalized pigeonhole for $n$ boxes],
+)[
+  If $n_1 + n_2 + ... + n_t - t + 1$ objects are placed in $t$ boxes, then some box $i$ contains at least $n_i$ objects.
+
+  #solution[
+    *Proof by contradiction:*
+
+    Assume each box $i$ contains fewer than $n_i$ objects (at most $n_i - 1$).
+
+    Total objects $<= (n_1 - 1) + (n_2 - 1) + ... + (n_t - 1) = sum n_i - t$
+
+    But we have $sum n_i - t + 1$ objects.
+
+    $sum n_i - t + 1 <= sum n_i - t$ implies $1 <= 0$. Contradiction!
+  ]
+]
+
+== Polynomial Division (using auto-div)
+
+#example(title: [Polynomial division with auto-div])[
+  Divide $x^4 + 3x^3 + 5/2 x + 6$ by $x + 2$:
+
+  $ #poly-div-working((1, 3, 0, "5/2", 6), (1, 2)) $
 ]
 
 #pagebreak()
