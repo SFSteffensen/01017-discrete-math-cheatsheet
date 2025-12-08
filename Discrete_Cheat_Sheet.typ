@@ -326,8 +326,6 @@
   [Reflexive + Antisymmetric + Transitive],
 )
 
-#pagebreak()
-
 = Examples + Solutions
 
 == Number Theory
@@ -445,7 +443,7 @@
   ]
 ]
 
-#pagebreak()
+
 
 == Functions: Injective/Surjective Analysis
 
@@ -474,7 +472,7 @@
   ]
 ]
 
-#pagebreak()
+
 
 == Graph Theory
 
@@ -522,7 +520,7 @@
   In Königsberg: degrees are 5, 3, 3, 3 (all odd) → No Euler path or circuit.
 ]
 
-#pagebreak()
+
 
 == Combinatorics
 
@@ -590,7 +588,7 @@
   ]
 ]
 
-#pagebreak()
+
 
 == Relations
 
@@ -617,7 +615,7 @@
   These four equivalence classes *partition* the integers.
 ]
 
-#pagebreak()
+
 
 == Partitions of Sets
 
@@ -641,7 +639,7 @@
   ]
 ]
 
-#pagebreak()
+
 
 == Proof by Induction
 
@@ -679,7 +677,7 @@
   ]
 ]
 
-#pagebreak()
+
 
 == Polynomial Divisibility
 
@@ -718,7 +716,7 @@
   ]
 ]
 
-#pagebreak()
+
 
 == Hall's Theorem / Matching
 
@@ -742,7 +740,7 @@
   ]
 ]
 
-#pagebreak()
+
 
 == Propositional Logic (Truth Sayer/Liar Puzzles)
 
@@ -899,7 +897,7 @@
   $ #poly-div-working((1, 3, 0, "5/2", 6), (1, 2)) $
 ]
 
-#pagebreak()
+
 
 = Calculation Workspace
 
@@ -1001,7 +999,7 @@ $ K_(20): 20 "vertices", #complete-edges(20) "edges" $
 
 $ |A union B union C union D| = 4(200) - 6(50) + 4(25) - 5 = #ie4(200, 50, 25, 5) $
 
-#pagebreak()
+
 
 == Your Calculations Here
 
