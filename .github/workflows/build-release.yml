@@ -1,0 +1,41 @@
+name: Build and Release PDF
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Typst
+        uses: typst-community/setup-typst@v3
+        with:
+          typst-version: "latest"
+
+      - name: Compile Typst document
+        run: |
+          typst compile "Discrete_Cheat_Sheet.typ" "Discrete-Cheat-Sheet.pdf"
+        env:
+          TYPST_PACKAGE_PATH: ${{ github.workspace }}/packages
+
+      - name: Get current date
+        id: date
+        run: echo "date=$(date +'%Y-%m-%d-%H%M%S')" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.date.outputs.date }}
+          name: Release ${{ steps.date.outputs.date }}
+          files: Discrete-Cheat-Sheet.pdf
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
