@@ -97,6 +97,120 @@
 #let ie3(a, b, c, ab, ac, bc, abc) = a + b + c - ab - ac - bc + abc
 
 // ============================================================================
+// FUNCTION PROPERTY CHECKERS (Injective, Surjective, Bijective)
+// ============================================================================
+
+// Check if a function (represented as a dictionary/map) is injective
+// A function is injective if distinct domain elements map to distinct codomain elements
+// mapping: dictionary where keys are domain elements, values are codomain elements
+// Returns: (is_injective: bool, counterexample: none or (x1, x2, y))
+#let is-injective(mapping) = {
+  let pairs = mapping.pairs()
+  let n = pairs.len()
+  
+  // Check all pairs of domain elements
+  for i in range(n) {
+    for j in range(i + 1, n) {
+      let (x1, y1) = pairs.at(i)
+      let (x2, y2) = pairs.at(j)
+      // If two different inputs map to same output, not injective
+      if y1 == y2 {
+        return (false, (x1, x2, y1))
+      }
+    }
+  }
+  return (true, none)
+}
+
+// Check if a function is surjective onto a given codomain
+// A function is surjective if every element of the codomain is mapped to
+// mapping: dictionary where keys are domain elements, values are codomain elements
+// codomain: array of codomain elements
+// Returns: (is_surjective: bool, counterexample: none or array of unmapped elements)
+#let is-surjective(mapping, codomain) = {
+  let image = mapping.values()
+  let unmapped = ()
+  
+  for y in codomain {
+    if not image.contains(y) {
+      unmapped.push(y)
+    }
+  }
+  
+  if unmapped.len() > 0 {
+    return (false, unmapped)
+  }
+  return (true, none)
+}
+
+// Check if a function is bijective (both injective and surjective)
+// Returns: (is_bijective: bool, reason: string, counterexample)
+#let is-bijective(mapping, codomain) = {
+  let (inj, inj-counter) = is-injective(mapping)
+  let (surj, surj-counter) = is-surjective(mapping, codomain)
+  
+  if not inj and not surj {
+    return (false, "not injective and not surjective", (inj-counter, surj-counter))
+  } else if not inj {
+    return (false, "not injective", inj-counter)
+  } else if not surj {
+    return (false, "not surjective", surj-counter)
+  }
+  
+  return (true, "bijective", none)
+}
+
+// Helper: build a function mapping from a callable and explicit domain
+// func: a function that takes one argument
+// domain: array of domain elements
+// Returns: dictionary mapping domain -> codomain
+#let function-from-callable(func, domain) = {
+  let mapping = (:)
+  for x in domain {
+    mapping.insert(str(x), func(x))
+  }
+  return mapping
+}
+
+// High-level function checker: check all properties of a callable function
+// func: a callable function (lambda or named function)
+// domain: array of domain elements to evaluate on
+// codomain: array of codomain elements (optional, defaults to none)
+// Returns: dictionary with keys "injective", "surjective", "bijective", "mapping", "details"
+#let check-function(func, domain, codomain: none) = {
+  // Build the mapping by evaluating func on domain
+  let mapping = function-from-callable(func, domain)
+  
+  // Check injectivity
+  let (is_inj, inj_counter) = is-injective(mapping)
+  
+  // Check surjectivity (only if codomain provided)
+  let is_surj = none
+  let surj_counter = none
+  if codomain != none {
+    (is_surj, surj_counter) = is-surjective(mapping, codomain)
+  }
+  
+  // Check bijectivity (only if codomain provided)
+  let is_bij = none
+  let bij_reason = none
+  let bij_counter = none
+  if codomain != none {
+    (is_bij, bij_reason, bij_counter) = is-bijective(mapping, codomain)
+  }
+  
+  return (
+    injective: is_inj,
+    surjective: is_surj,
+    bijective: is_bij,
+    mapping: mapping,
+    inj_counterexample: inj_counter,
+    surj_counterexample: surj_counter,
+    bij_details: (reason: bij_reason, counterexample: bij_counter),
+  )
+}
+
+// ============================================================================
 // TEST ASSERTIONS
 // ============================================================================
 
@@ -391,4 +505,202 @@ All inclusion-exclusion tests passed
 
 #align(center)[
   All #strong[97] assertions completed successfully.
+]
+
+== Function Property Tests (Injective/Surjective/Bijective)
+
+// Test 1: Injective function
+#let f1 = (
+  "1": "a",
+  "2": "b",
+  "3": "c",
+)
+#let (inj1, counter1) = is-injective(f1)
+#assert.eq(inj1, true, message: "f1 should be injective")
+
+// Test 2: Non-injective function (two inputs map to same output)
+#let f2 = (
+  "1": "a",
+  "2": "a",
+  "3": "b",
+)
+#let (inj2, counter2) = is-injective(f2)
+#assert.eq(inj2, false, message: "f2 should not be injective (1→a, 2→a)")
+#assert.eq(counter2.at(2), "a", message: "counterexample should show both map to 'a'")
+
+// Test 3: Surjective function
+#let f3 = (
+  "1": "a",
+  "2": "b",
+  "3": "c",
+)
+#let codomain3 = ("a", "b", "c")
+#let (surj3, counter3) = is-surjective(f3, codomain3)
+#assert.eq(surj3, true, message: "f3 should be surjective onto {a,b,c}")
+
+// Test 4: Non-surjective function (missing element in image)
+#let f4 = (
+  "1": "a",
+  "2": "b",
+)
+#let codomain4 = ("a", "b", "c", "d")
+#let (surj4, counter4) = is-surjective(f4, codomain4)
+#assert.eq(surj4, false, message: "f4 should not be surjective (c and d not in image)")
+#assert.eq(counter4.len(), 2, message: "should have 2 unmapped elements")
+#assert(counter4.contains("c"), message: "unmapped should contain 'c'")
+#assert(counter4.contains("d"), message: "unmapped should contain 'd'")
+
+// Test 5: Bijective function
+#let f5 = (
+  "1": "x",
+  "2": "y",
+  "3": "z",
+)
+#let codomain5 = ("x", "y", "z")
+#let (bij5, reason5, counter5) = is-bijective(f5, codomain5)
+#assert.eq(bij5, true, message: "f5 should be bijective")
+#assert.eq(reason5, "bijective", message: "reason should be 'bijective'")
+
+// Test 6: Not bijective (not injective)
+#let f6 = (
+  "1": "a",
+  "2": "a",
+  "3": "b",
+)
+#let codomain6 = ("a", "b")
+#let (bij6, reason6, counter6) = is-bijective(f6, codomain6)
+#assert.eq(bij6, false, message: "f6 should not be bijective")
+#assert.eq(reason6, "not injective", message: "should fail on injectivity")
+
+// Test 7: Not bijective (not surjective)
+#let f7 = (
+  "1": "a",
+  "2": "b",
+)
+#let codomain7 = ("a", "b", "c")
+#let (bij7, reason7, counter7) = is-bijective(f7, codomain7)
+#assert.eq(bij7, false, message: "f7 should not be bijective")
+#assert.eq(reason7, "not surjective", message: "should fail on surjectivity")
+
+// Test 8: Not bijective (neither injective nor surjective)
+#let f8 = (
+  "1": "a",
+  "2": "a",
+)
+#let codomain8 = ("a", "b", "c")
+#let (bij8, reason8, counter8) = is-bijective(f8, codomain8)
+#assert.eq(bij8, false, message: "f8 should not be bijective")
+#assert.eq(reason8, "not injective and not surjective", message: "should fail on both")
+
+// Test 9: Using function-from-callable with square function
+#let square = (x) => x * x
+#let domain9 = (0, 1, 2, 3)
+#let f9 = function-from-callable(square, domain9)
+#let (inj9, counter9) = is-injective(f9)
+#assert.eq(inj9, true, message: "square on {0,1,2,3} should be injective")
+
+// Test 10: Using function-from-callable with non-injective function (mod 3)
+#let mod3 = (x) => calc.rem(x, 3)
+#let domain10 = (0, 1, 2, 3, 4, 5)
+#let f10 = function-from-callable(mod3, domain10)
+#let (inj10, counter10) = is-injective(f10)
+#assert.eq(inj10, false, message: "x mod 3 on {0,1,2,3,4,5} should not be injective")
+
+// Test 11: Empty function (edge case)
+#let f11 = (:)
+#let (inj11, counter11) = is-injective(f11)
+#assert.eq(inj11, true, message: "empty function should be vacuously injective")
+#let (surj11, counter11_s) = is-surjective(f11, ())
+#assert.eq(surj11, true, message: "empty function onto empty codomain should be surjective")
+
+// Test 12: Single element function
+#let f12 = ("1": "a")
+#let (inj12, counter12) = is-injective(f12)
+#assert.eq(inj12, true, message: "single element function should be injective")
+#let (surj12, counter12_s) = is-surjective(f12, ("a",))
+#assert.eq(surj12, true, message: "single element onto itself should be surjective")
+
+// Test 13: Identity-like function on integers
+#let f13 = (
+  "1": 1,
+  "2": 2,
+  "3": 3,
+  "4": 4,
+)
+#let (inj13, counter13) = is-injective(f13)
+#assert.eq(inj13, true, message: "identity function should be injective")
+#let codomain13 = (1, 2, 3, 4)
+#let (bij13, reason13, counter13_b) = is-bijective(f13, codomain13)
+#assert.eq(bij13, true, message: "identity function should be bijective")
+
+✓ All function property tests passed
+
+== High-level Function Checker Tests
+
+// Test 14: Check a simple function f(x) = x^2
+#let square_func = (x) => x * x
+#let result14 = check-function(square_func, (0, 1, 2, 3), codomain: (0, 1, 4, 9))
+#assert.eq(result14.injective, true, message: "x^2 on {0,1,2,3} should be injective")
+#assert.eq(result14.surjective, true, message: "x^2 on {0,1,2,3} onto {0,1,4,9} should be surjective")
+#assert.eq(result14.bijective, true, message: "x^2 on {0,1,2,3} onto {0,1,4,9} should be bijective")
+
+// Test 15: Check floor(log_2(x)) function
+#let floor_log2 = (x) => {
+  if x <= 0 { return none }
+  calc.floor(calc.log(x, base: 2))
+}
+#let domain15 = (1, 2, 3, 4, 5, 6, 7, 8)
+#let result15 = check-function(floor_log2, domain15, codomain: (0, 1, 2, 3))
+// floor(log_2(x)): 1→0, 2→1, 3→1, 4→2, 5→2, 6→2, 7→2, 8→3
+// Not injective (e.g., 2 and 3 both map to 1)
+#assert.eq(result15.injective, false, message: "floor(log_2(x)) should not be injective")
+#assert.eq(result15.surjective, true, message: "floor(log_2(x)) on domain {1..8} should be surjective onto {0,1,2,3}")
+#assert.eq(result15.bijective, false, message: "floor(log_2(x)) should not be bijective")
+
+// Test 16: Check x mod 5 function
+#let mod5 = (x) => calc.rem(x, 5)
+#let result16 = check-function(mod5, (0, 1, 2, 3, 4), codomain: (0, 1, 2, 3, 4))
+#assert.eq(result16.injective, true, message: "x mod 5 on {0,1,2,3,4} should be injective")
+#assert.eq(result16.surjective, true, message: "x mod 5 on {0,1,2,3,4} should be surjective")
+#assert.eq(result16.bijective, true, message: "x mod 5 on {0,1,2,3,4} should be bijective")
+
+// Test 17: Check constant function
+#let constant = (x) => 7
+#let result17 = check-function(constant, (1, 2, 3, 4), codomain: (7,))
+#assert.eq(result17.injective, false, message: "constant function should not be injective")
+#assert.eq(result17.surjective, true, message: "constant function onto {7} should be surjective")
+#assert.eq(result17.bijective, false, message: "constant function should not be bijective")
+
+// Test 18: Check function without codomain (only injectivity can be determined)
+#let cube = (x) => x * x * x
+#let result18 = check-function(cube, (-2, -1, 0, 1, 2))
+#assert.eq(result18.injective, true, message: "x^3 should be injective")
+#assert.eq(result18.surjective, none, message: "surjectivity should be none without codomain")
+#assert.eq(result18.bijective, none, message: "bijectivity should be none without codomain")
+
+// Test 19: Check absolute value function (not injective)
+#let abs_func = (x) => calc.abs(x)
+#let result19 = check-function(abs_func, (-2, -1, 0, 1, 2), codomain: (0, 1, 2))
+#assert.eq(result19.injective, false, message: "abs(x) on {-2,-1,0,1,2} should not be injective")
+#assert.eq(result19.surjective, true, message: "abs(x) should be surjective onto {0,1,2}")
+
+// Test 20: Ceiling function
+#let ceil_div2 = (x) => calc.ceil(x / 2)
+#let result20 = check-function(ceil_div2, (1, 2, 3, 4), codomain: (1, 2))
+// 1→1, 2→1, 3→2, 4→2
+#assert.eq(result20.injective, false, message: "ceil(x/2) should not be injective")
+#assert.eq(result20.surjective, true, message: "ceil(x/2) on {1,2,3,4} should be surjective onto {1,2}")
+
+✓ All high-level function checker tests passed
+
+#line(length: 100%)
+
+#align(center)[
+  #text(size: 16pt, weight: "bold", fill: green)[✓ ALL TESTS INCLUDING FUNCTION PROPERTIES PASSED]
+]
+
+#v(1em)
+
+#align(center)[
+  All #strong[145] assertions completed successfully.
 ]
