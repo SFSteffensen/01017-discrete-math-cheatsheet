@@ -200,11 +200,9 @@
     let (x, M) = result
     let verifications = range(remainders.len()).map(i => {
       let r = calc.rem(x, moduli.at(i))
-      let want = remainders.at(i)
-      let check = if r == want { [✓] } else { [✗] }
-      [#x ≡ #r (mod #(moduli.at(i))) #check]
+      [#x ≡ #r (mod #(moduli.at(i)))]
     })
-    [*CRT Solution:* $x equiv #x pmod(#M)$ #h(1em) Verify: #verifications.join(", ")]
+    [#rect(inset: 6pt)[*CRT Solution:* $x equiv #x pmod(#M)$] #h(1em) Verify: #verifications.join(", ")]
   }
 }
 
@@ -505,12 +503,12 @@
     *Key fact:* If $gcd(a, b) = d$, then $d^2 | a b$.
 
     Check each:
-    - $d = 1$: $1^2 = 1 | 5292$ ✓
-    - $d = 3$: $3^2 = 9 | 5292$ ✓ (since $3^3 | 5292$)
-    - $d = 36 = 2^2 dot 3^2$: Need $36^2 = 2^4 dot 3^4 | 2^2 dot 3^3 dot 7^2$. But $2^4 divides.not 2^2$! ✗
-    - $d = 42 = 2 dot 3 dot 7$: $42^2 = 2^2 dot 3^2 dot 7^2 | 2^2 dot 3^3 dot 7^2$ ✓
+    - $d = 1$: $1^2 = 1 | 5292$ (valid)
+    - $d = 3$: $3^2 = 9 | 5292$ (valid, since $3^3 | 5292$)
+    - $d = 36 = 2^2 dot 3^2$: Need $36^2 = 2^4 dot 3^4 | 2^2 dot 3^3 dot 7^2$. But $2^4 divides.not 2^2$!
+    - $d = 42 = 2 dot 3 dot 7$: $42^2 = 2^2 dot 3^2 dot 7^2 | 2^2 dot 3^3 dot 7^2$ (valid)
 
-    *Answer:* 36 cannot be the GCD.
+    #rect(inset: 6pt)[*Answer:* 36 cannot be the GCD.]
   ]
 ]
 
@@ -535,13 +533,13 @@
   #solution[
     Inverse exists iff $gcd(n, 9) = 1$.
 
-    *For $n = 6$:* $gcd(6, 9) = 3 != 1$ → *Does not exist*
+    *For $n = 6$:* $gcd(6, 9) = 3 != 1$ → #rect(inset: 4pt)[Does not exist]
 
-    *For $n = 2$:* $gcd(2, 9) = 1$ ✓. Find $x$ with $2x equiv 1 pmod(9)$:
-    - $2 dot 5 = 10 equiv 1 pmod(9)$ → *Answer: 5*
+    *For $n = 2$:* $gcd(2, 9) = 1$. Find $x$ with $2x equiv 1 pmod(9)$:
+    - $2 dot 5 = 10 equiv 1 pmod(9)$ → #rect(inset: 4pt)[*5*]
 
-    *For $n = 7$:* $gcd(7, 9) = 1$ ✓. Find $x$ with $7x equiv 1 pmod(9)$:
-    - $7 dot 4 = 28 equiv 1 pmod(9)$ → *Answer: 4*
+    *For $n = 7$:* $gcd(7, 9) = 1$. Find $x$ with $7x equiv 1 pmod(9)$:
+    - $7 dot 4 = 28 equiv 1 pmod(9)$ → #rect(inset: 4pt)[*4*]
   ]
 ]
 
@@ -571,13 +569,11 @@
 
     Thus $t_2 = 5 + 7t_3$, giving $x = 9 + 10(5) = 59$
 
-    *Answer:* $x equiv 59 pmod(70)$
+    #rect(inset: 6pt)[*Answer:* $x equiv 59 pmod(70)$]
 
-    *Verify:* $59 = 29 dot 2 + 1$ ✓, $59 = 11 dot 5 + 4$ ✓, $59 = 8 dot 7 + 3$ ✓
+    *Verify:* $59 = 29 dot 2 + 1$, $59 = 11 dot 5 + 4$, $59 = 8 dot 7 + 3$
   ]
 ]
-
-
 
 == Functions: Injective/Surjective Analysis
 
@@ -670,7 +666,7 @@
 
   *For $K_(2n)$:* edges $= binom(2n, 2) = (2n)(2n-1)/2 = n(2n-1)$
 
-  Alternative form: $2binom(n, 2) + n^2 = n(n-1) + n^2 = n(2n-1)$ ✓
+  Alternative form: $2binom(n, 2) + n^2 = n(n-1) + n^2 = n(2n-1)$
 ]
 
 === Degree Sequences
@@ -683,7 +679,7 @@
 
     By handshaking lemma: $sum deg(v) = 2|E|$ must be even.
 
-    Since $19$ is odd, *such a graph does not exist.*
+    Since $19$ is odd, #rect(inset: 4pt)[such a graph does not exist.]
   ]
 ]
 
@@ -701,8 +697,6 @@
   In Königsberg: degrees are 5, 3, 3, 3 (all odd) → No Euler path or circuit.
 ]
 
-
-
 == Combinatorics
 
 === Binomial Theorem
@@ -714,12 +708,12 @@
     General term: $binom(8, k)(2x^2)^k (-3y^3)^(8-k) = binom(8, k) 2^k (-3)^(8-k) x^(2k) y^(3(8-k))$
 
     *For $x^8 y^{12}$:* Need $2k = 8$ and $3(8-k) = 12$.
-    - $k = 4$ ✓
-    - Coefficient: $binom(8, 4) dot 2^4 dot (-3)^4 = 70 dot 16 dot 81 = 90720$
+    - $k = 4$ (valid)
+    - #rect(inset: 4pt)[Coefficient: $binom(8, 4) dot 2^4 dot (-3)^4 = 70 dot 16 dot 81 = 90720$]
 
     *For $x^6 y^9$:* Need $2k = 6$ and $3(8-k) = 9$.
-    - $k = 3$ but $8-k = 5$, and $3 dot 5 = 15 != 9$ ✗
-    - *Coefficient is 0*
+    - $k = 3$ but $8-k = 5$, and $3 dot 5 = 15 != 9$ (invalid)
+    - #rect(inset: 4pt)[Coefficient is 0]
   ]
 ]
 
@@ -769,19 +763,17 @@
   ]
 ]
 
-
-
 == Relations
 
 #example(title: [Classify relations on ${1,2,3,4,5,6}$])[
   $R_1 = {(1,2),(2,3),(1,3),(4,5),(5,6),(4,6)}$
 
   #solution[
-    - Reflexive? Missing $(1,1), (2,2), ...$ ✗
-    - Symmetric? $(1,2) in R$ but $(2,1) in.not R$ ✗
-    - Antisymmetric? No pair $(x,y), (y,x)$ with $x != y$ both present. ✓
-    - Transitive? Check: $(1,2),(2,3) in R$ and $(1,3) in R$ ✓; $(4,5),(5,6) in R$ and $(4,6) in R$ ✓
-    - *Transitive and antisymmetric only*
+    - Reflexive? Missing $(1,1), (2,2), ...$ (no)
+    - Symmetric? $(1,2) in R$ but $(2,1) in.not R$ (no)
+    - Antisymmetric? No pair $(x,y), (y,x)$ with $x != y$ both present (yes)
+    - Transitive? $(1,2),(2,3) in R$ and $(1,3) in R$; $(4,5),(5,6) in R$ and $(4,6) in R$ (yes)
+    - #rect(inset: 4pt)[Transitive and antisymmetric only]
   ]
 ]
 
@@ -795,8 +787,6 @@
   $
   These four equivalence classes *partition* the integers.
 ]
-
-
 
 == Partitions of Sets
 
@@ -819,8 +809,6 @@
     - *NO, doesn't cover everything*
   ]
 ]
-
-
 
 == Proof by Induction
 
@@ -846,7 +834,7 @@
   Every $2^n times 2^n$ checkerboard with one square removed can be tiled by L-triominoes.
 
   #solution[
-    *Base case ($n=1$):* $2 times 2$ board with one square removed = L-triomino. ✓
+    *Base case ($n=1$):* $2 times 2$ board with one square removed = L-triomino.
 
     *Inductive step:* Assume true for $2^k times 2^k$. For $2^(k+1) times 2^(k+1)$ board:
 
@@ -854,11 +842,9 @@
     2. The removed square is in one quadrant
     3. Place one L-triomino at the center, covering one square from each of the other three quadrants
     4. Now each quadrant is a $2^k times 2^k$ board with one square removed
-    5. By IH, each can be tiled. ✓
+    5. By IH, each can be tiled.
   ]
 ]
-
-
 
 == Polynomial Divisibility
 
@@ -869,10 +855,10 @@
     $x + 1 | x^n + 1$ iff $x = -1$ is a root of $x^n + 1$.
 
     Evaluate at $x = -1$: $(-1)^n + 1$
-    - If $n$ odd: $(-1)^n = -1$, so $-1 + 1 = 0$ ✓
-    - If $n$ even: $(-1)^n = 1$, so $1 + 1 = 2 != 0$ ✗
+    - If $n$ odd: $(-1)^n = -1$, so $-1 + 1 = 0$ (root)
+    - If $n$ even: $(-1)^n = 1$, so $1 + 1 = 2 != 0$ (not a root)
 
-    *Answer:* Divisible for all odd $n$, not divisible for any even $n$.
+    #rect(inset: 6pt)[Divisible for all odd $n$, not divisible for any even $n$.]
   ]
 ]
 
@@ -897,8 +883,6 @@
   ]
 ]
 
-
-
 == Hall's Theorem / Matching
 
 #example(
@@ -920,8 +904,6 @@
     *Minimum cables:* $5 times 6 = 30$
   ]
 ]
-
-
 
 == Propositional Logic (Truth Sayer/Liar Puzzles)
 
@@ -972,10 +954,10 @@
 
   #solution[
     *For 6:* Divisors (excluding 6): $1, 2, 3$
-    $ 1 + 2 + 3 = 6 $ ✓
+    $ 1 + 2 + 3 = 6 $
 
     *For 28:* Divisors (excluding 28): $1, 2, 4, 7, 14$
-    $ 1 + 2 + 4 + 7 + 14 = 28 $ ✓
+    $ 1 + 2 + 4 + 7 + 14 = 28 $
 
     *Theorem:* $2^(p-1)(2^p - 1)$ is perfect when $2^p - 1$ is prime (Mersenne prime).
 
@@ -1012,7 +994,7 @@
     - $x in B union C$ and $x in.not A$
     - $(x in B or x in C)$ and $x in.not A$
 
-    Both sides are equivalent. ✓
+    #rect(inset: 6pt)[Both sides are equivalent.]
   ]
 ]
 
@@ -1022,11 +1004,13 @@
   Let $R$ on sets of real numbers: $S R T$ iff $|S| = |T|$.
 
   #solution[
-    *Reflexive:* $|S| = |S|$ ✓
+    *Reflexive:* $|S| = |S|$ (yes)
 
-    *Symmetric:* $|S| = |T| arrow.double |T| = |S|$ ✓
+    *Symmetric:* $|S| = |T| arrow.double |T| = |S|$ (yes)
 
-    *Transitive:* $|S| = |T|$ and $|T| = |U| arrow.double |S| = |U|$ ✓
+    *Transitive:* $|S| = |T|$ and $|T| = |U| arrow.double |S| = |U|$ (yes)
+
+    #rect(inset: 4pt)[This is an equivalence relation.]
 
     *Equivalence classes:*
     - $[{0, 1, 2}]$ = all sets with exactly 3 elements
@@ -1038,13 +1022,15 @@
   #solution[
     This is an equivalence relation (represents fractions $a/b = c/d$).
 
-    *Reflexive:* $a dot b = b dot a$ ✓
+    *Reflexive:* $a dot b = b dot a$ (yes)
 
-    *Symmetric:* $a d = b c arrow.double c b = d a$ ✓
+    *Symmetric:* $a d = b c arrow.double c b = d a$ (yes)
 
     *Transitive:* If $a d = b c$ and $c f = d e$, then:
     - Multiply: $a d f = b c f = b d e$
-    - Since $d > 0$: $a f = b e$ ✓
+    - Since $d > 0$: $a f = b e$ (yes)
+
+    #rect(inset: 4pt)[This is an equivalence relation.]
 
     Equivalence class of $(1, 2)$: all pairs $(k, 2k)$ for $k in ZZ^+$
   ]
@@ -1077,8 +1063,6 @@
 
   $ #poly-div-working((1, 3, 0, "5/2", 6), (1, 2)) $
 ]
-
-
 
 = Calculation Workspace
 
@@ -1180,6 +1164,7 @@ $ K_(20): 20 "vertices", #complete-edges(20) "edges" $
 
 $ |A union B union C union D| = 4(200) - 6(50) + 4(25) - 5 = #ie4(200, 50, 25, 5) $
 
+<<<<<<< HEAD
 == Function Property Checker
 
 Check if functions are injective/surjective/bijective on finite domains:
@@ -1224,6 +1209,8 @@ Check if functions are injective/surjective/bijective on finite domains:
 
 *Note:* Only works for finite domains. For infinite domains (ℤ, ℕ, ℝ), use mathematical proofs.
 
+=======
+>>>>>>> d0216f8ad2f18ac93d93e750ddc1170840e51458
 == Your Calculations Here
 
 // Add your exam calculations below

@@ -230,7 +230,7 @@
 #assert.eq(derangement(8), 14833, message: "D_8 should be 14833")
 #assert.eq(derangement(10), 1334961, message: "D_10 should be 1334961")
 
-✓ All derangement tests passed
+All derangement tests passed
 
 == Extended GCD Tests
 
@@ -267,7 +267,7 @@
 #assert.eq(g7, 21, message: "gcd(1071, 462) should be 21")
 #assert.eq(1071 * s7 + 462 * t7, 21, message: "Bézout identity should hold for (1071, 462)")
 
-✓ All extended GCD tests passed
+All extended GCD tests passed
 
 == Modular Inverse Tests
 
@@ -297,7 +297,7 @@
 #assert.eq(mod-inverse(1, 7), 1, message: "1^(-1) mod 7 should be 1")
 #assert.eq(mod-inverse(1, 100), 1, message: "1^(-1) mod 100 should be 1")
 
-✓ All modular inverse tests passed
+All modular inverse tests passed
 
 == Chinese Remainder Theorem Tests
 
@@ -332,7 +332,7 @@
 #let crt_fail = crt-solve((1, 2), (4, 6))
 #assert.eq(crt_fail, none, message: "CRT with non-coprime moduli (4, 6) should return none")
 
-✓ All CRT tests passed
+All CRT tests passed
 
 == Hypercube Edges Tests
 
@@ -354,7 +354,7 @@
 // Q_6 has 192 edges
 #assert.eq(hypercube-edges(6), 192, message: "Q_6 should have 192 edges")
 
-✓ All hypercube edge tests passed
+All hypercube edge tests passed
 
 == Complete Graph Edges Tests
 
@@ -382,7 +382,7 @@
 // K_100 has 4950 edges
 #assert.eq(complete-edges(100), 4950, message: "K_100 should have 4950 edges")
 
-✓ All complete graph edge tests passed
+All complete graph edge tests passed
 
 == Built-in Typst calc Functions Validation
 
@@ -416,12 +416,12 @@
 #assert.eq(calc.quo(17, 5), 3, message: "17 ÷ 5 should be 3")
 #assert.eq(calc.quo(100, 7), 14, message: "100 ÷ 7 should be 14")
 
-✓ All built-in function tests passed
+All built-in function tests passed
 
 #line(length: 100%)
 
 #align(center)[
-  #text(size: 16pt, weight: "bold", fill: green)[✓ ALL TESTS PASSED]
+  #text(size: 16pt, weight: "bold", fill: green)[ALL TESTS PASSED]
 ]
 
 #v(1em)
@@ -442,7 +442,7 @@
 #assert.eq(sum-proper-divisors(28), 28, message: "sum of proper divisors of 28 should be 28")
 #assert.eq(sum-proper-divisors(12), 16, message: "sum of proper divisors of 12 should be 16")
 
-✓ All perfect number tests passed
+All perfect number tests passed
 
 == Euler's Totient Function Tests
 
@@ -457,7 +457,7 @@
 #assert.eq(euler-phi(7), 6, message: "φ(7) should be 6 (prime)")
 #assert.eq(euler-phi(13), 12, message: "φ(13) should be 12 (prime)")
 
-✓ All Euler's totient tests passed
+All Euler's totient tests passed
 
 == Stirling Numbers Tests
 
@@ -481,7 +481,7 @@
 #assert.eq(stirling2(5, 0), 0, message: "S(5,0) should be 0")
 #assert.eq(stirling2(3, 5), 0, message: "S(3,5) should be 0 (k > n)")
 
-✓ All Stirling number tests passed
+All Stirling number tests passed
 
 == Inclusion-Exclusion Tests
 
@@ -493,12 +493,12 @@
 #assert.eq(ie3(10, 20, 30, 5, 3, 7, 2), 47, message: "IE3 test")
 #assert.eq(ie3(100, 100, 100, 50, 50, 50, 25), 175, message: "IE3: symmetric case")
 
-✓ All inclusion-exclusion tests passed
+All inclusion-exclusion tests passed
 
 #line(length: 100%)
 
 #align(center)[
-  #text(size: 16pt, weight: "bold", fill: green)[✓ ALL EXTENDED TESTS PASSED]
+  #text(size: 16pt, weight: "bold", fill: green)[ALL EXTENDED TESTS PASSED]
 ]
 
 #v(1em)
