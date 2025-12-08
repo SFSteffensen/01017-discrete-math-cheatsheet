@@ -20,6 +20,12 @@ jobs:
         with:
           typst-version: "latest"
 
+      - name: Run tests
+        run: |
+          typst compile "tests.typ" "/tmp/tests.pdf"
+        env:
+          TYPST_PACKAGE_PATH: ${{ github.workspace }}/packages
+
       - name: Compile Typst document
         run: |
           typst compile "Discrete_Cheat_Sheet.typ" "Discrete-Cheat-Sheet.pdf"
