@@ -10,11 +10,7 @@
   semester: "2025 Fall",
 )
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// CALCULATION FUNCTIONS (using Typst built-ins where possible)
-// ═══════════════════════════════════════════════════════════════════════════════
-
-// Note: Typst provides these built-in functions in calc module:
+// Typst built-in functions (calc module):
 // - calc.gcd(a, b) - Greatest Common Divisor
 // - calc.lcm(a, b) - Least Common Multiple
 // - calc.fact(n) - Factorial n!
@@ -26,9 +22,7 @@
 // - calc.abs(x) - Absolute value
 // - calc.floor(x), calc.ceil(x) - Floor and ceiling
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// CUSTOM CALCULATION FUNCTIONS
-// ═══════════════════════════════════════════════════════════════════════════════
+// Custom calculation functions
 
 // pmod: LaTeX-style "parenthesized mod" notation: a ≡ b (mod m)
 #let pmod(m) = $space (mod #m)$
@@ -84,9 +78,7 @@
 // Complete graph edges: K_n has n(n-1)/2 edges
 #let complete-edges(n) = calc.quo(n * (n - 1), 2)
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// DISPLAY HELPER FUNCTIONS
-// ═══════════════════════════════════════════════════════════════════════════════
+// Display helper functions
 
 #let show-gcd(a, b) = {
   let result = calc.gcd(a, b)
@@ -139,10 +131,6 @@
     [*CRT Solution:* $x equiv #x pmod(#M)$ #h(1em) Verify: #verifications.join(", ")]
   }
 }
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// PART 1: KEY FORMULAS & QUICK REFERENCE
-// ═══════════════════════════════════════════════════════════════════════════════
 
 = Key Formulas & Quick Reference
 
@@ -263,10 +251,6 @@
 )
 
 #pagebreak()
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// PART 2: EXAMPLES + SOLUTIONS BY TOPIC
-// ═══════════════════════════════════════════════════════════════════════════════
 
 = Examples + Solutions
 
@@ -684,10 +668,6 @@
 
 #pagebreak()
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// PART 3: CALCULATION WORKSPACE
-// ═══════════════════════════════════════════════════════════════════════════════
-
 = Calculation Workspace
 
 == Quick Reference: Built-in Typst Functions
@@ -792,9 +772,7 @@ $ |A union B union C union D| = 4(200) - 6(50) + 4(25) - 5 = #ie4(200, 50, 25, 5
 
 == Your Calculations Here
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// ADD YOUR EXAM CALCULATIONS BELOW
-// ═══════════════════════════════════════════════════════════════════════════════
+// Add your exam calculations below
 
 // GCD and Bézout coefficients:
 // #show-bezout(your_a, your_b)
