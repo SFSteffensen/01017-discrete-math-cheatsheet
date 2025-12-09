@@ -23,13 +23,19 @@ This cheat sheet provides:
 | **Set Theory**    | De Morgan's laws, power sets, inclusion-exclusion                          |
 | **Relations**     | Reflexivity, symmetry, transitivity, equivalence relations, partial orders |
 
-## Old Exams
+## Exams
 
-The repository includes formatted past exams for practice:
+The repository includes formatted past exams for practice in the `exams/` folder:
 
-| Exam                | File           |
-| ------------------- | -------------- |
-| **E24 (Fall 2024)** | `Exam2024.typ` |
+| Exam                | File                 |
+| ------------------- | -------------------- |
+| **E24 (Fall 2024)** | `exams/Exam2024.typ` |
+
+### Solved Exams
+
+The `solved/` directory is for your personal solved copies of exams. Copy an exam from `exams/` into `solved/`, fill in your answers, and use it for practice.
+
+**Note:** The contents of `solved/` are gitignored — your personal solutions stay local and won't be committed to the repository.
 
 ## Built-in Functions
 
