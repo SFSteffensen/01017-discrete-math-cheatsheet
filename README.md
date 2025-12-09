@@ -23,6 +23,14 @@ This cheat sheet provides:
 | **Set Theory**    | De Morgan's laws, power sets, inclusion-exclusion                          |
 | **Relations**     | Reflexivity, symmetry, transitivity, equivalence relations, partial orders |
 
+## Old Exams
+
+The repository includes formatted past exams for practice:
+
+| Exam                | File           |
+| ------------------- | -------------- |
+| **E24 (Fall 2024)** | `Exam2024.typ` |
+
 ## Built-in Functions
 
 The document includes Typst functions for live calculations:
