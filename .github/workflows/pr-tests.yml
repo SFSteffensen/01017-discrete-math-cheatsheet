@@ -1,0 +1,95 @@
+name: PR Tests & Function Coverage
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  check-test-coverage:
+    name: Check Test Coverage for Functions
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check that new functions have tests
+        run: |
+          echo "🔍 Checking test coverage for Typst functions..."
+
+          # Extract function names from main file (matches #let function-name(...) = {)
+          # This pattern looks for functions (with parentheses), not simple variable assignments
+          MAIN_FUNCTIONS=$(grep -oE '#let [a-zA-Z_-]+\(' Discrete_Cheat_Sheet.typ | \
+                          sed 's/#let //' | sed 's/($//' | sort -u)
+
+          echo "📋 Functions defined in Discrete_Cheat_Sheet.typ:"
+          echo "$MAIN_FUNCTIONS" | while read -r func; do
+            echo "  - $func"
+          done
+
+          # Check each function has at least one test (either an assertion or a call in the test file)
+          MISSING_TESTS=""
+          TESTED_COUNT=0
+          TOTAL_COUNT=0
+
+          for func in $MAIN_FUNCTIONS; do
+            TOTAL_COUNT=$((TOTAL_COUNT + 1))
+            # Look for the function being called in tests.typ (function-name( pattern)
+            # Also check for assert statements that reference the function
+            if grep -qE "(${func}\(|#let.*${func})" tests.typ; then
+              TESTED_COUNT=$((TESTED_COUNT + 1))
+              echo "✅ $func - has tests"
+            else
+              MISSING_TESTS="$MISSING_TESTS $func"
+              echo "❌ $func - MISSING TESTS"
+            fi
+          done
+
+          echo ""
+          echo "📊 Coverage: $TESTED_COUNT / $TOTAL_COUNT functions have tests"
+
+          if [ -n "$MISSING_TESTS" ]; then
+            echo ""
+            echo "❌ ERROR: The following functions are missing test coverage:"
+            for func in $MISSING_TESTS; do
+              echo "  - $func"
+            done
+            echo ""
+            echo "Please add tests for these functions in tests.typ before merging."
+            exit 1
+          fi
+
+          echo ""
+          echo "✅ All functions have test coverage!"
+
+  run-tests:
+    name: Run Typst Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Typst
+        uses: typst-community/setup-typst@v3
+        with:
+          typst-version: "latest"
+
+      - name: Run test suite
+        run: |
+          echo "🧪 Running Typst test suite..."
+          typst compile "tests.typ" "/tmp/tests.pdf"
+          echo "✅ All tests passed!"
+        env:
+          TYPST_PACKAGE_PATH: ${{ github.workspace }}/packages
+
+      - name: Verify main document compiles
+        run: |
+          echo "📄 Compiling main document..."
+          typst compile "Discrete_Cheat_Sheet.typ" "/tmp/cheatsheet.pdf"
+          echo "✅ Main document compiled successfully!"
+        env:
+          TYPST_PACKAGE_PATH: ${{ github.workspace }}/packages
