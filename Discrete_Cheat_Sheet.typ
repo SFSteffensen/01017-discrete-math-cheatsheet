@@ -154,9 +154,7 @@
 // Complete graph edges: K_n has n(n-1)/2 edges
 #let complete-edges(n) = calc.quo(n * (n - 1), 2)
 
-// ═══════════════════════════════════════════════════════════════════════════════
 // Additional functions ported from Python tools
-// ═══════════════════════════════════════════════════════════════════════════════
 
 // Primality test: check if n is prime
 #let is-prime(n) = {
