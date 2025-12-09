@@ -684,7 +684,7 @@ All inclusion-exclusion tests passed
 #let (bij13, reason13, counter13_b) = is-bijective(f13, codomain13)
 #assert.eq(bij13, true, message: "identity function should be bijective")
 
-✓ All function property tests passed
+All function property tests passed
 
 == High-level Function Checker Tests
 
@@ -742,7 +742,7 @@ All inclusion-exclusion tests passed
 #assert.eq(result20.injective, false, message: "ceil(x/2) should not be injective")
 #assert.eq(result20.surjective, true, message: "ceil(x/2) on {1,2,3,4} should be surjective onto {1,2}")
 
-✓ All high-level function checker tests passed
+All high-level function checker tests passed
 
 == Primality Tests
 
@@ -849,7 +849,7 @@ All relation property tests passed
 #line(length: 100%)
 
 #align(center)[
-  #text(size: 16pt, weight: "bold", fill: green)[✓ ALL TESTS PASSED]
+  #text(size: 16pt, weight: "bold", fill: green)[ALL TESTS PASSED]
 ]
 
 #v(1em)
