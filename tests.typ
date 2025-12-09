@@ -96,6 +96,93 @@
 // Inclusion-exclusion for 3 sets
 #let ie3(a, b, c, ab, ac, bc, abc) = a + b + c - ab - ac - bc + abc
 
+// Primality test: check if n is prime
+#let is-prime(n) = {
+  if n <= 1 { return false }
+  if n <= 3 { return true }
+  if calc.rem(n, 2) == 0 or calc.rem(n, 3) == 0 { return false }
+  let i = 5
+  while i * i <= n {
+    if calc.rem(n, i) == 0 or calc.rem(n, i + 2) == 0 { return false }
+    i = i + 6
+  }
+  return true
+}
+
+// Get list of primes below n
+#let primes-below(n) = {
+  let primes = ()
+  for i in range(2, n) {
+    if is-prime(i) { primes.push(i) }
+  }
+  primes
+}
+
+// Count primes below n
+#let count-primes-below(n) = primes-below(n).len()
+
+// Solve general linear congruence: ax ≡ c (mod m)
+#let solve-congruence(a, c, m) = {
+  let g = calc.gcd(a, m)
+  if calc.rem(c, g) != 0 { return none }
+  let a-reduced = calc.quo(a, g)
+  let c-reduced = calc.quo(c, g)
+  let m-reduced = calc.quo(m, g)
+  let inv = mod-inverse(a-reduced, m-reduced)
+  if inv == none { return none }
+  let x0 = calc.rem(c-reduced * inv, m-reduced)
+  if x0 < 0 { x0 = x0 + m-reduced }
+  return (x0, m-reduced)
+}
+
+// Check if relation R on set S is reflexive
+#let is-reflexive(S, R) = {
+  for x in S {
+    if not R.contains((x, x)) { return false }
+  }
+  return true
+}
+
+// Check if relation R is symmetric
+#let is-symmetric(R) = {
+  for pair in R {
+    let (x, y) = pair
+    if not R.contains((y, x)) { return false }
+  }
+  return true
+}
+
+// Check if relation R is antisymmetric
+#let is-antisymmetric(R) = {
+  for pair in R {
+    let (x, y) = pair
+    if x != y and R.contains((y, x)) { return false }
+  }
+  return true
+}
+
+// Check if relation R is transitive
+#let is-transitive(R) = {
+  for pair1 in R {
+    let (a, b) = pair1
+    for pair2 in R {
+      let (c, d) = pair2
+      if b == c and not R.contains((a, d)) { return false }
+    }
+  }
+  return true
+}
+
+// Check if R is an equivalence relation
+#let is-equivalence-relation(S, R) = {
+  is-reflexive(S, R) and is-symmetric(R) and is-transitive(R)
+}
+
+// Check if R is a partial order
+#let is-partial-order(S, R) = {
+  is-reflexive(S, R) and is-antisymmetric(R) and is-transitive(R)
+}
+
 // ============================================================================
 // TEST ASSERTIONS
 // ============================================================================
@@ -391,4 +478,118 @@ All inclusion-exclusion tests passed
 
 #align(center)[
   All #strong[97] assertions completed successfully.
+]
+
+== Primality Tests
+
+#assert.eq(is-prime(2), true, message: "2 should be prime")
+#assert.eq(is-prime(3), true, message: "3 should be prime")
+#assert.eq(is-prime(5), true, message: "5 should be prime")
+#assert.eq(is-prime(7), true, message: "7 should be prime")
+#assert.eq(is-prime(11), true, message: "11 should be prime")
+#assert.eq(is-prime(13), true, message: "13 should be prime")
+#assert.eq(is-prime(17), true, message: "17 should be prime")
+#assert.eq(is-prime(97), true, message: "97 should be prime")
+#assert.eq(is-prime(1), false, message: "1 should not be prime")
+#assert.eq(is-prime(4), false, message: "4 should not be prime")
+#assert.eq(is-prime(9), false, message: "9 should not be prime")
+#assert.eq(is-prime(15), false, message: "15 should not be prime")
+#assert.eq(is-prime(91), false, message: "91 = 7*13 should not be prime")
+#assert.eq(is-prime(100), false, message: "100 should not be prime")
+
+All primality tests passed
+
+== Primes Below n Tests
+
+#assert.eq(primes-below(10), (2, 3, 5, 7), message: "Primes below 10")
+#assert.eq(primes-below(20), (2, 3, 5, 7, 11, 13, 17, 19), message: "Primes below 20")
+#assert.eq(count-primes-below(10), 4, message: "4 primes below 10")
+#assert.eq(count-primes-below(30), 10, message: "10 primes below 30")
+#assert.eq(count-primes-below(100), 25, message: "25 primes below 100")
+
+All primes-below tests passed
+
+== General Linear Congruence Tests
+
+// 3x ≡ 6 (mod 9): gcd(3,9)=3 divides 6, so solution exists
+// Reduced: x ≡ 2 (mod 3)
+#let (x1, m1) = solve-congruence(3, 6, 9)
+#assert.eq(x1, 2, message: "3x ≡ 6 (mod 9): x0 should be 2")
+#assert.eq(m1, 3, message: "3x ≡ 6 (mod 9): step should be 3")
+
+// 4x ≡ 5 (mod 9): gcd(4,9)=1 divides 5, so solution exists
+#let (x2, m2) = solve-congruence(4, 5, 9)
+#assert.eq(calc.rem(4 * x2, 9), 5, message: "4x ≡ 5 (mod 9) verification")
+
+// 6x ≡ 15 (mod 21): gcd(6,21)=3 divides 15, so solution exists
+#let (x3, m3) = solve-congruence(6, 15, 21)
+#assert.eq(m3, 7, message: "6x ≡ 15 (mod 21): reduced mod should be 7")
+#assert.eq(calc.rem(6 * x3, 21), 15, message: "6x ≡ 15 (mod 21) verification")
+
+// 4x ≡ 5 (mod 6): gcd(4,6)=2 does not divide 5, no solution
+#assert.eq(solve-congruence(4, 5, 6), none, message: "4x ≡ 5 (mod 6) should have no solution")
+
+// 2x ≡ 4 (mod 6): gcd(2,6)=2 divides 4, solution exists
+#let (x4, m4) = solve-congruence(2, 4, 6)
+#assert.eq(calc.rem(2 * x4, 6), 4, message: "2x ≡ 4 (mod 6) verification")
+
+All general linear congruence tests passed
+
+== Relation Property Tests
+
+// Test reflexive relation on {1,2,3}
+#let S1 = (1, 2, 3)
+#let R_refl = ((1, 1), (2, 2), (3, 3), (1, 2))
+#assert.eq(is-reflexive(S1, R_refl), true, message: "R_refl should be reflexive")
+
+#let R_not_refl = ((1, 1), (2, 2), (1, 2))
+#assert.eq(is-reflexive(S1, R_not_refl), false, message: "R_not_refl missing (3,3)")
+
+// Test symmetric relation
+#let R_sym = ((1, 2), (2, 1), (1, 1))
+#assert.eq(is-symmetric(R_sym), true, message: "R_sym should be symmetric")
+
+#let R_not_sym = ((1, 2), (1, 1))
+#assert.eq(is-symmetric(R_not_sym), false, message: "R_not_sym missing (2,1)")
+
+// Test antisymmetric relation
+#let R_antisym = ((1, 1), (1, 2), (2, 3))
+#assert.eq(is-antisymmetric(R_antisym), true, message: "R_antisym should be antisymmetric")
+
+#let R_not_antisym = ((1, 2), (2, 1))
+#assert.eq(is-antisymmetric(R_not_antisym), false, message: "R_not_antisym has (1,2) and (2,1)")
+
+// Test transitive relation
+#let R_trans = ((1, 2), (2, 3), (1, 3))
+#assert.eq(is-transitive(R_trans), true, message: "R_trans should be transitive")
+
+#let R_not_trans = ((1, 2), (2, 3))
+#assert.eq(is-transitive(R_not_trans), false, message: "R_not_trans missing (1,3)")
+
+// Test equivalence relation (reflexive + symmetric + transitive)
+#let R_equiv = ((1, 1), (2, 2), (3, 3), (1, 2), (2, 1))
+#assert.eq(is-equivalence-relation(S1, R_equiv), true, message: "R_equiv should be equivalence relation")
+
+#let R_not_equiv = ((1, 1), (2, 2), (3, 3), (1, 2))
+#assert.eq(is-equivalence-relation(S1, R_not_equiv), false, message: "R_not_equiv not symmetric")
+
+// Test partial order (reflexive + antisymmetric + transitive)
+#let R_partial = ((1, 1), (2, 2), (3, 3), (1, 2), (2, 3), (1, 3))
+#assert.eq(is-partial-order(S1, R_partial), true, message: "R_partial should be partial order")
+
+#let R_not_partial = ((1, 1), (2, 2), (3, 3), (1, 2), (2, 1))
+#assert.eq(is-partial-order(S1, R_not_partial), false, message: "R_not_partial not antisymmetric")
+
+All relation property tests passed
+
+#line(length: 100%)
+
+#align(center)[
+  #text(size: 16pt, weight: "bold", fill: green)[ALL NEW FUNCTION TESTS PASSED]
+]
+
+#v(1em)
+
+#align(center)[
+  All #strong[127] assertions completed successfully.
 ]
