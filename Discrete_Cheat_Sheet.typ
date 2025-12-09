@@ -154,6 +154,105 @@
 // Complete graph edges: K_n has n(n-1)/2 edges
 #let complete-edges(n) = calc.quo(n * (n - 1), 2)
 
+// Additional functions ported from Python tools
+
+// Primality test: check if n is prime
+#let is-prime(n) = {
+  if n <= 1 { return false }
+  if n <= 3 { return true }
+  if calc.rem(n, 2) == 0 or calc.rem(n, 3) == 0 { return false }
+  let i = 5
+  while i * i <= n {
+    if calc.rem(n, i) == 0 or calc.rem(n, i + 2) == 0 { return false }
+    i = i + 6
+  }
+  return true
+}
+
+// Get list of primes below n
+#let primes-below(n) = {
+  let primes = ()
+  for i in range(2, n) {
+    if is-prime(i) { primes.push(i) }
+  }
+  primes
+}
+
+// Count primes below n
+#let count-primes-below(n) = primes-below(n).len()
+
+// Solve general linear congruence: ax ≡ c (mod m)
+// Returns (x0, step) where solutions are x ≡ x0 (mod step), or none if no solution
+#let solve-congruence(a, c, m) = {
+  let g = calc.gcd(a, m)
+  if calc.rem(c, g) != 0 { return none }
+  let a-reduced = calc.quo(a, g)
+  let c-reduced = calc.quo(c, g)
+  let m-reduced = calc.quo(m, g)
+  let inv = mod-inverse(a-reduced, m-reduced)
+  if inv == none { return none }
+  let x0 = calc.rem(c-reduced * inv, m-reduced)
+  if x0 < 0 { x0 = x0 + m-reduced }
+  return (x0, m-reduced)
+}
+
+// Relation property checkers (relations given as arrays of pairs)
+
+// Check if relation R on set S is reflexive: ∀x ∈ S: (x,x) ∈ R
+#let is-reflexive(S, R) = {
+  for x in S {
+    if not R.contains((x, x)) { return false }
+  }
+  return true
+}
+
+// Check if relation R is symmetric: (x,y) ∈ R ⟹ (y,x) ∈ R
+#let is-symmetric(R) = {
+  for pair in R {
+    let (x, y) = pair
+    if not R.contains((y, x)) { return false }
+  }
+  return true
+}
+
+// Check if relation R is antisymmetric: (x,y) ∈ R ∧ (y,x) ∈ R ⟹ x = y
+#let is-antisymmetric(R) = {
+  for pair in R {
+    let (x, y) = pair
+    if x != y and R.contains((y, x)) { return false }
+  }
+  return true
+}
+
+// Check if relation R is transitive: (x,y) ∈ R ∧ (y,z) ∈ R ⟹ (x,z) ∈ R
+#let is-transitive(R) = {
+  for pair1 in R {
+    let (a, b) = pair1
+    for pair2 in R {
+      let (c, d) = pair2
+      if b == c and not R.contains((a, d)) { return false }
+    }
+  }
+  return true
+}
+
+// Check if R is an equivalence relation on S (reflexive + symmetric + transitive)
+#let is-equivalence-relation(S, R) = {
+  is-reflexive(S, R) and is-symmetric(R) and is-transitive(R)
+}
+
+// Check if R is a partial order on S (reflexive + antisymmetric + transitive)
+#let is-partial-order(S, R) = {
+  is-reflexive(S, R) and is-antisymmetric(R) and is-transitive(R)
+}
+
+// Division with quotient and remainder display
+#let divide-with-remainder(a, b) = {
+  let q = calc.quo(a, b)
+  let r = calc.rem(a, b)
+  (q, r)
+}
+
 // Display helper functions
 
 #let show-gcd(a, b) = {
@@ -206,9 +305,60 @@
   }
 }
 
-// ============================================================================
-// FUNCTION PROPERTY CHECKERS (Injective, Surjective, Bijective)
-// ============================================================================
+// Display helper for primality check
+#let show-is-prime(n) = {
+  let result = is-prime(n)
+  if result {
+    [$ #n "is prime" $]
+  } else {
+    [$ #n "is not prime" $]
+  }
+}
+
+// Display helper for primes below n
+#let show-primes-below(n) = {
+  let primes = primes-below(n)
+  let count = primes.len()
+  [There are #count primes below #n: #primes.map(p => str(p)).join(", ")]
+}
+
+// Display helper for solving ax ≡ c (mod m)
+#let show-solve-congruence(a, c, m) = {
+  let result = solve-congruence(a, c, m)
+  if result == none {
+    [$ #a x equiv #c pmod(#m) $ has no solution (since $gcd(#a, #m) = #calc.gcd(a, m)$ does not divide $#c$)]
+  } else {
+    let (x0, step) = result
+    [$ #a x equiv #c pmod(#m) arrow.double x equiv #x0 pmod(#step) $]
+  }
+}
+
+// Display helper for relation properties
+#let show-relation-properties(S, R, name: "R") = {
+  let refl = is-reflexive(S, R)
+  let sym = is-symmetric(R)
+  let antisym = is-antisymmetric(R)
+  let trans = is-transitive(R)
+  let equiv = refl and sym and trans
+  let partial = refl and antisym and trans
+
+  [
+    *Relation #name on set #S:*
+    - Reflexive: #if refl [Yes] else [No]
+    - Symmetric: #if sym [Yes] else [No]
+    - Antisymmetric: #if antisym [Yes] else [No]
+    - Transitive: #if trans [Yes] else [No]
+    - #if equiv [#rect(inset: 4pt)[*Equivalence relation*]] else if partial [#rect(inset: 4pt)[*Partial order*]] else [Neither equivalence relation nor partial order]
+  ]
+}
+
+// Display helper for division with remainder
+#let show-division(a, b) = {
+  let (q, r) = divide-with-remainder(a, b)
+  [$ #a = #b dot #q + #r $]
+}
+
+// Function property checkers (Injective, Surjective, Bijective)
 
 // Check if a function (represented as a dictionary/map) is injective
 // A function is injective if distinct domain elements map to distinct codomain elements
@@ -335,7 +485,7 @@
     }
 
     #if result.surj_counterexample != none {
-      [_Surjectivity fails:_ unmapped elements: #{result.surj_counterexample.map(x => $#x$).join(", ")}]
+      [_Surjectivity fails:_ unmapped elements: #{ result.surj_counterexample.map(x => $#x$).join(", ") }]
     }
   ]
 }
@@ -631,22 +781,22 @@
       columns: (1.5fr, 1fr, 1fr, 1fr),
       stroke: 0.5pt,
       inset: 6pt,
-      [*Function*], [*Injective*], [*Surjective*], [*Bijective*],
-
+      [*Function*],
+      [*Injective*],
+      [*Surjective*],
+      [*Bijective*],
       [$f(x) = x^2$ on ${0,1,2,3}$ #linebreak() onto ${0,1,4,9}$],
-      [#{if sq_result.injective [Yes] else [No]}],
-      [#{if sq_result.surjective [Yes] else [No]}],
-      [#{if sq_result.bijective [Yes] else [No]}],
-
+      [#{ if sq_result.injective [Yes] else [No] }],
+      [#{ if sq_result.surjective [Yes] else [No] }],
+      [#{ if sq_result.bijective [Yes] else [No] }],
       [$f(x) = x mod 5$ on ${0,1,2,3,4}$],
-      [#{if mod_result.injective [Yes] else [No]}],
-      [#{if mod_result.surjective [Yes] else [No]}],
-      [#{if mod_result.bijective [Yes] else [No]}],
-
+      [#{ if mod_result.injective [Yes] else [No] }],
+      [#{ if mod_result.surjective [Yes] else [No] }],
+      [#{ if mod_result.bijective [Yes] else [No] }],
       [$f(x) = |x|$ on ${-2,-1,0,1,2}$ #linebreak() onto ${0,1,2}$],
-      [#{if abs_result.injective [Yes] else [No]}],
-      [#{if abs_result.surjective [Yes] else [No]}],
-      [#{if abs_result.bijective [Yes] else [No]}],
+      [#{ if abs_result.injective [Yes] else [No] }],
+      [#{ if abs_result.surjective [Yes] else [No] }],
+      [#{ if abs_result.bijective [Yes] else [No] }],
     )
   ]
 ]
@@ -1164,36 +1314,48 @@ $ K_(20): 20 "vertices", #complete-edges(20) "edges" $
 
 $ |A union B union C union D| = 4(200) - 6(50) + 4(25) - 5 = #ie4(200, 50, 25, 5) $
 
-<<<<<<< HEAD
+== Primality and Primes
+
+#show-is-prime(17)
+#show-is-prime(91)
+#show-is-prime(97)
+#show-primes-below(30)
+
+== General Linear Congruences
+
+Solve $a x equiv c pmod(m)$:
+
+#show-solve-congruence(3, 6, 9)
+#show-solve-congruence(4, 5, 9)
+#show-solve-congruence(6, 15, 21)
+
+== Division with Remainder
+
+#show-division(17, 5)
+#show-division(100, 7)
+#show-division(5292, 36)
+
+== Relation Properties
+
+#show-relation-properties((1, 2, 3), ((1, 1), (2, 2), (3, 3), (1, 2), (2, 1)), name: "R₁")
+
+#show-relation-properties((1, 2, 3), ((1, 1), (2, 2), (3, 3), (1, 2), (2, 3), (1, 3)), name: "R₂")
+
 == Function Property Checker
 
 Check if functions are injective/surjective/bijective on finite domains:
 
-#table(
-  columns: (2fr, 3fr),
-  stroke: 0.5pt,
-  inset: 8pt,
-  [*Usage*], [*Code*],
-
-  [Define function],
-  [```typst
+#table(columns: (2fr, 3fr), stroke: 0.5pt, inset: 8pt, [*Usage*], [*Code*], [Define function], [```typst
 #let my_func = (x) => calc.floor(calc.log(x, base: 2))
-```],
-
-  [Check properties],
-  [```typst
+```], [Check properties], [```typst
 #let result = check-function(
   my_func,
   (1, 2, 3, 4, 5, 6, 7, 8),  // domain
   codomain: (0, 1, 2, 3)      // codomain (optional)
 )
-```],
-
-  [Display results],
-  [```typst
+```], [Display results], [```typst
 #show-function-check(result, func-name: "f")
-```],
-)
+```])
 
 *Quick examples:*
 
@@ -1209,8 +1371,6 @@ Check if functions are injective/surjective/bijective on finite domains:
 
 *Note:* Only works for finite domains. For infinite domains (ℤ, ℕ, ℝ), use mathematical proofs.
 
-=======
->>>>>>> d0216f8ad2f18ac93d93e750ddc1170840e51458
 == Your Calculations Here
 
 // Add your exam calculations below
@@ -1229,6 +1389,18 @@ Check if functions are injective/surjective/bijective on finite domains:
 
 // Derangement:
 // #show-derangement(n)
+
+// Primality check:
+// #show-is-prime(n)
+
+// Primes below n:
+// #show-primes-below(n)
+
+// General linear congruence ax ≡ c (mod m):
+// #show-solve-congruence(a, c, m)
+
+// Relation properties:
+// #show-relation-properties(S, R, name: "R")
 
 // Direct calculations using built-ins:
 // $ gcd(a, b) = #calc.gcd(a, b) $

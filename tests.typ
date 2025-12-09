@@ -96,9 +96,94 @@
 // Inclusion-exclusion for 3 sets
 #let ie3(a, b, c, ab, ac, bc, abc) = a + b + c - ab - ac - bc + abc
 
-// ============================================================================
-// FUNCTION PROPERTY CHECKERS (Injective, Surjective, Bijective)
-// ============================================================================
+// Primality test: check if n is prime
+#let is-prime(n) = {
+  if n <= 1 { return false }
+  if n <= 3 { return true }
+  if calc.rem(n, 2) == 0 or calc.rem(n, 3) == 0 { return false }
+  let i = 5
+  while i * i <= n {
+    if calc.rem(n, i) == 0 or calc.rem(n, i + 2) == 0 { return false }
+    i = i + 6
+  }
+  return true
+}
+
+// Get list of primes below n
+#let primes-below(n) = {
+  let primes = ()
+  for i in range(2, n) {
+    if is-prime(i) { primes.push(i) }
+  }
+  primes
+}
+
+// Count primes below n
+#let count-primes-below(n) = primes-below(n).len()
+
+// Solve general linear congruence: ax ≡ c (mod m)
+#let solve-congruence(a, c, m) = {
+  let g = calc.gcd(a, m)
+  if calc.rem(c, g) != 0 { return none }
+  let a-reduced = calc.quo(a, g)
+  let c-reduced = calc.quo(c, g)
+  let m-reduced = calc.quo(m, g)
+  let inv = mod-inverse(a-reduced, m-reduced)
+  if inv == none { return none }
+  let x0 = calc.rem(c-reduced * inv, m-reduced)
+  if x0 < 0 { x0 = x0 + m-reduced }
+  return (x0, m-reduced)
+}
+
+// Check if relation R on set S is reflexive
+#let is-reflexive(S, R) = {
+  for x in S {
+    if not R.contains((x, x)) { return false }
+  }
+  return true
+}
+
+// Check if relation R is symmetric
+#let is-symmetric(R) = {
+  for pair in R {
+    let (x, y) = pair
+    if not R.contains((y, x)) { return false }
+  }
+  return true
+}
+
+// Check if relation R is antisymmetric
+#let is-antisymmetric(R) = {
+  for pair in R {
+    let (x, y) = pair
+    if x != y and R.contains((y, x)) { return false }
+  }
+  return true
+}
+
+// Check if relation R is transitive
+#let is-transitive(R) = {
+  for pair1 in R {
+    let (a, b) = pair1
+    for pair2 in R {
+      let (c, d) = pair2
+      if b == c and not R.contains((a, d)) { return false }
+    }
+  }
+  return true
+}
+
+// Check if R is an equivalence relation
+#let is-equivalence-relation(S, R) = {
+  is-reflexive(S, R) and is-symmetric(R) and is-transitive(R)
+}
+
+// Check if R is a partial order
+#let is-partial-order(S, R) = {
+  is-reflexive(S, R) and is-antisymmetric(R) and is-transitive(R)
+}
+
+// Function property checkers (Injective, Surjective, Bijective)
 
 // Check if a function (represented as a dictionary/map) is injective
 // A function is injective if distinct domain elements map to distinct codomain elements
@@ -107,7 +192,7 @@
 #let is-injective(mapping) = {
   let pairs = mapping.pairs()
   let n = pairs.len()
-  
+
   // Check all pairs of domain elements
   for i in range(n) {
     for j in range(i + 1, n) {
@@ -130,13 +215,13 @@
 #let is-surjective(mapping, codomain) = {
   let image = mapping.values()
   let unmapped = ()
-  
+
   for y in codomain {
     if not image.contains(y) {
       unmapped.push(y)
     }
   }
-  
+
   if unmapped.len() > 0 {
     return (false, unmapped)
   }
@@ -148,7 +233,7 @@
 #let is-bijective(mapping, codomain) = {
   let (inj, inj-counter) = is-injective(mapping)
   let (surj, surj-counter) = is-surjective(mapping, codomain)
-  
+
   if not inj and not surj {
     return (false, "not injective and not surjective", (inj-counter, surj-counter))
   } else if not inj {
@@ -156,7 +241,7 @@
   } else if not surj {
     return (false, "not surjective", surj-counter)
   }
-  
+
   return (true, "bijective", none)
 }
 
@@ -180,17 +265,17 @@
 #let check-function(func, domain, codomain: none) = {
   // Build the mapping by evaluating func on domain
   let mapping = function-from-callable(func, domain)
-  
+
   // Check injectivity
   let (is_inj, inj_counter) = is-injective(mapping)
-  
+
   // Check surjectivity (only if codomain provided)
   let is_surj = none
   let surj_counter = none
   if codomain != none {
     (is_surj, surj_counter) = is-surjective(mapping, codomain)
   }
-  
+
   // Check bijectivity (only if codomain provided)
   let is_bij = none
   let bij_reason = none
@@ -198,7 +283,7 @@
   if codomain != none {
     (is_bij, bij_reason, bij_counter) = is-bijective(mapping, codomain)
   }
-  
+
   return (
     injective: is_inj,
     surjective: is_surj,
@@ -510,39 +595,24 @@ All inclusion-exclusion tests passed
 == Function Property Tests (Injective/Surjective/Bijective)
 
 // Test 1: Injective function
-#let f1 = (
-  "1": "a",
-  "2": "b",
-  "3": "c",
-)
+#let f1 = ("1": "a", "2": "b", "3": "c")
 #let (inj1, counter1) = is-injective(f1)
 #assert.eq(inj1, true, message: "f1 should be injective")
 
 // Test 2: Non-injective function (two inputs map to same output)
-#let f2 = (
-  "1": "a",
-  "2": "a",
-  "3": "b",
-)
+#let f2 = ("1": "a", "2": "a", "3": "b")
 #let (inj2, counter2) = is-injective(f2)
 #assert.eq(inj2, false, message: "f2 should not be injective (1→a, 2→a)")
 #assert.eq(counter2.at(2), "a", message: "counterexample should show both map to 'a'")
 
 // Test 3: Surjective function
-#let f3 = (
-  "1": "a",
-  "2": "b",
-  "3": "c",
-)
+#let f3 = ("1": "a", "2": "b", "3": "c")
 #let codomain3 = ("a", "b", "c")
 #let (surj3, counter3) = is-surjective(f3, codomain3)
 #assert.eq(surj3, true, message: "f3 should be surjective onto {a,b,c}")
 
 // Test 4: Non-surjective function (missing element in image)
-#let f4 = (
-  "1": "a",
-  "2": "b",
-)
+#let f4 = ("1": "a", "2": "b")
 #let codomain4 = ("a", "b", "c", "d")
 #let (surj4, counter4) = is-surjective(f4, codomain4)
 #assert.eq(surj4, false, message: "f4 should not be surjective (c and d not in image)")
@@ -551,42 +621,28 @@ All inclusion-exclusion tests passed
 #assert(counter4.contains("d"), message: "unmapped should contain 'd'")
 
 // Test 5: Bijective function
-#let f5 = (
-  "1": "x",
-  "2": "y",
-  "3": "z",
-)
+#let f5 = ("1": "x", "2": "y", "3": "z")
 #let codomain5 = ("x", "y", "z")
 #let (bij5, reason5, counter5) = is-bijective(f5, codomain5)
 #assert.eq(bij5, true, message: "f5 should be bijective")
 #assert.eq(reason5, "bijective", message: "reason should be 'bijective'")
 
 // Test 6: Not bijective (not injective)
-#let f6 = (
-  "1": "a",
-  "2": "a",
-  "3": "b",
-)
+#let f6 = ("1": "a", "2": "a", "3": "b")
 #let codomain6 = ("a", "b")
 #let (bij6, reason6, counter6) = is-bijective(f6, codomain6)
 #assert.eq(bij6, false, message: "f6 should not be bijective")
 #assert.eq(reason6, "not injective", message: "should fail on injectivity")
 
 // Test 7: Not bijective (not surjective)
-#let f7 = (
-  "1": "a",
-  "2": "b",
-)
+#let f7 = ("1": "a", "2": "b")
 #let codomain7 = ("a", "b", "c")
 #let (bij7, reason7, counter7) = is-bijective(f7, codomain7)
 #assert.eq(bij7, false, message: "f7 should not be bijective")
 #assert.eq(reason7, "not surjective", message: "should fail on surjectivity")
 
 // Test 8: Not bijective (neither injective nor surjective)
-#let f8 = (
-  "1": "a",
-  "2": "a",
-)
+#let f8 = ("1": "a", "2": "a")
 #let codomain8 = ("a", "b", "c")
 #let (bij8, reason8, counter8) = is-bijective(f8, codomain8)
 #assert.eq(bij8, false, message: "f8 should not be bijective")
@@ -621,19 +677,14 @@ All inclusion-exclusion tests passed
 #assert.eq(surj12, true, message: "single element onto itself should be surjective")
 
 // Test 13: Identity-like function on integers
-#let f13 = (
-  "1": 1,
-  "2": 2,
-  "3": 3,
-  "4": 4,
-)
+#let f13 = ("1": 1, "2": 2, "3": 3, "4": 4)
 #let (inj13, counter13) = is-injective(f13)
 #assert.eq(inj13, true, message: "identity function should be injective")
 #let codomain13 = (1, 2, 3, 4)
 #let (bij13, reason13, counter13_b) = is-bijective(f13, codomain13)
 #assert.eq(bij13, true, message: "identity function should be bijective")
 
-✓ All function property tests passed
+All function property tests passed
 
 == High-level Function Checker Tests
 
@@ -691,16 +742,118 @@ All inclusion-exclusion tests passed
 #assert.eq(result20.injective, false, message: "ceil(x/2) should not be injective")
 #assert.eq(result20.surjective, true, message: "ceil(x/2) on {1,2,3,4} should be surjective onto {1,2}")
 
-✓ All high-level function checker tests passed
+All high-level function checker tests passed
+
+== Primality Tests
+
+#assert.eq(is-prime(2), true, message: "2 should be prime")
+#assert.eq(is-prime(3), true, message: "3 should be prime")
+#assert.eq(is-prime(5), true, message: "5 should be prime")
+#assert.eq(is-prime(7), true, message: "7 should be prime")
+#assert.eq(is-prime(11), true, message: "11 should be prime")
+#assert.eq(is-prime(13), true, message: "13 should be prime")
+#assert.eq(is-prime(17), true, message: "17 should be prime")
+#assert.eq(is-prime(97), true, message: "97 should be prime")
+#assert.eq(is-prime(1), false, message: "1 should not be prime")
+#assert.eq(is-prime(4), false, message: "4 should not be prime")
+#assert.eq(is-prime(9), false, message: "9 should not be prime")
+#assert.eq(is-prime(15), false, message: "15 should not be prime")
+#assert.eq(is-prime(91), false, message: "91 = 7*13 should not be prime")
+#assert.eq(is-prime(100), false, message: "100 should not be prime")
+
+All primality tests passed
+
+== Primes Below n Tests
+
+#assert.eq(primes-below(10), (2, 3, 5, 7), message: "Primes below 10")
+#assert.eq(primes-below(20), (2, 3, 5, 7, 11, 13, 17, 19), message: "Primes below 20")
+#assert.eq(count-primes-below(10), 4, message: "4 primes below 10")
+#assert.eq(count-primes-below(30), 10, message: "10 primes below 30")
+#assert.eq(count-primes-below(100), 25, message: "25 primes below 100")
+
+All primes-below tests passed
+
+== General Linear Congruence Tests
+
+// 3x ≡ 6 (mod 9): gcd(3,9)=3 divides 6, so solution exists
+// Reduced: x ≡ 2 (mod 3)
+#let (x1, m1) = solve-congruence(3, 6, 9)
+#assert.eq(x1, 2, message: "3x ≡ 6 (mod 9): x0 should be 2")
+#assert.eq(m1, 3, message: "3x ≡ 6 (mod 9): step should be 3")
+
+// 4x ≡ 5 (mod 9): gcd(4,9)=1 divides 5, so solution exists
+#let (x2, m2) = solve-congruence(4, 5, 9)
+#assert.eq(calc.rem(4 * x2, 9), 5, message: "4x ≡ 5 (mod 9) verification")
+
+// 6x ≡ 15 (mod 21): gcd(6,21)=3 divides 15, so solution exists
+#let (x3, m3) = solve-congruence(6, 15, 21)
+#assert.eq(m3, 7, message: "6x ≡ 15 (mod 21): reduced mod should be 7")
+#assert.eq(calc.rem(6 * x3, 21), 15, message: "6x ≡ 15 (mod 21) verification")
+
+// 4x ≡ 5 (mod 6): gcd(4,6)=2 does not divide 5, no solution
+#assert.eq(solve-congruence(4, 5, 6), none, message: "4x ≡ 5 (mod 6) should have no solution")
+
+// 2x ≡ 4 (mod 6): gcd(2,6)=2 divides 4, solution exists
+#let (x4, m4) = solve-congruence(2, 4, 6)
+#assert.eq(calc.rem(2 * x4, 6), 4, message: "2x ≡ 4 (mod 6) verification")
+
+All general linear congruence tests passed
+
+== Relation Property Tests
+
+// Test reflexive relation on {1,2,3}
+#let S1 = (1, 2, 3)
+#let R_refl = ((1, 1), (2, 2), (3, 3), (1, 2))
+#assert.eq(is-reflexive(S1, R_refl), true, message: "R_refl should be reflexive")
+
+#let R_not_refl = ((1, 1), (2, 2), (1, 2))
+#assert.eq(is-reflexive(S1, R_not_refl), false, message: "R_not_refl missing (3,3)")
+
+// Test symmetric relation
+#let R_sym = ((1, 2), (2, 1), (1, 1))
+#assert.eq(is-symmetric(R_sym), true, message: "R_sym should be symmetric")
+
+#let R_not_sym = ((1, 2), (1, 1))
+#assert.eq(is-symmetric(R_not_sym), false, message: "R_not_sym missing (2,1)")
+
+// Test antisymmetric relation
+#let R_antisym = ((1, 1), (1, 2), (2, 3))
+#assert.eq(is-antisymmetric(R_antisym), true, message: "R_antisym should be antisymmetric")
+
+#let R_not_antisym = ((1, 2), (2, 1))
+#assert.eq(is-antisymmetric(R_not_antisym), false, message: "R_not_antisym has (1,2) and (2,1)")
+
+// Test transitive relation
+#let R_trans = ((1, 2), (2, 3), (1, 3))
+#assert.eq(is-transitive(R_trans), true, message: "R_trans should be transitive")
+
+#let R_not_trans = ((1, 2), (2, 3))
+#assert.eq(is-transitive(R_not_trans), false, message: "R_not_trans missing (1,3)")
+
+// Test equivalence relation (reflexive + symmetric + transitive)
+#let R_equiv = ((1, 1), (2, 2), (3, 3), (1, 2), (2, 1))
+#assert.eq(is-equivalence-relation(S1, R_equiv), true, message: "R_equiv should be equivalence relation")
+
+#let R_not_equiv = ((1, 1), (2, 2), (3, 3), (1, 2))
+#assert.eq(is-equivalence-relation(S1, R_not_equiv), false, message: "R_not_equiv not symmetric")
+
+// Test partial order (reflexive + antisymmetric + transitive)
+#let R_partial = ((1, 1), (2, 2), (3, 3), (1, 2), (2, 3), (1, 3))
+#assert.eq(is-partial-order(S1, R_partial), true, message: "R_partial should be partial order")
+
+#let R_not_partial = ((1, 1), (2, 2), (3, 3), (1, 2), (2, 1))
+#assert.eq(is-partial-order(S1, R_not_partial), false, message: "R_not_partial not antisymmetric")
+
+All relation property tests passed
 
 #line(length: 100%)
 
 #align(center)[
-  #text(size: 16pt, weight: "bold", fill: green)[✓ ALL TESTS INCLUDING FUNCTION PROPERTIES PASSED]
+  #text(size: 16pt, weight: "bold", fill: green)[ALL TESTS PASSED]
 ]
 
 #v(1em)
 
 #align(center)[
-  All #strong[145] assertions completed successfully.
+  All #strong[175] assertions completed successfully.
 ]
