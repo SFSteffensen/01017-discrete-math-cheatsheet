@@ -185,13 +185,10 @@
 // Returns (x0, step) where solutions are x ≡ x0 (mod step), or none if no solution
 #let solve-congruence(a, c, m) = {
   let g = calc.gcd(a, m)
-  // Check if solution exists
   if calc.rem(c, g) != 0 { return none }
-  // Reduce the congruence
   let a-reduced = calc.quo(a, g)
   let c-reduced = calc.quo(c, g)
   let m-reduced = calc.quo(m, g)
-  // Find modular inverse of a-reduced mod m-reduced
   let inv = mod-inverse(a-reduced, m-reduced)
   if inv == none { return none }
   let x0 = calc.rem(c-reduced * inv, m-reduced)
@@ -200,6 +197,7 @@
 }
 
 // Relation property checkers (relations given as arrays of pairs)
+
 // Check if relation R on set S is reflexive: ∀x ∈ S: (x,x) ∈ R
 #let is-reflexive(S, R) = {
   for x in S {
@@ -358,6 +356,138 @@
 #let show-division(a, b) = {
   let (q, r) = divide-with-remainder(a, b)
   [$ #a = #b dot #q + #r $]
+}
+
+// Function property checkers (Injective, Surjective, Bijective)
+
+// Check if a function (represented as a dictionary/map) is injective
+// A function is injective if distinct domain elements map to distinct codomain elements
+// mapping: dictionary where keys are domain elements, values are codomain elements
+// Returns: (is_injective: bool, counterexample: none or (x1, x2, y))
+#let is-injective(mapping) = {
+  let pairs = mapping.pairs()
+  let n = pairs.len()
+
+  // Check all pairs of domain elements
+  for i in range(n) {
+    for j in range(i + 1, n) {
+      let (x1, y1) = pairs.at(i)
+      let (x2, y2) = pairs.at(j)
+      // If two different inputs map to same output, not injective
+      if y1 == y2 {
+        return (false, (x1, x2, y1))
+      }
+    }
+  }
+  return (true, none)
+}
+
+// Check if a function is surjective onto a given codomain
+// A function is surjective if every element of the codomain is mapped to
+// mapping: dictionary where keys are domain elements, values are codomain elements
+// codomain: array of codomain elements
+// Returns: (is_surjective: bool, counterexample: none or array of unmapped elements)
+#let is-surjective(mapping, codomain) = {
+  let image = mapping.values()
+  let unmapped = ()
+
+  for y in codomain {
+    if not image.contains(y) {
+      unmapped.push(y)
+    }
+  }
+
+  if unmapped.len() > 0 {
+    return (false, unmapped)
+  }
+  return (true, none)
+}
+
+// Check if a function is bijective (both injective and surjective)
+// Returns: (is_bijective: bool, reason: string, counterexample)
+#let is-bijective(mapping, codomain) = {
+  let (inj, inj-counter) = is-injective(mapping)
+  let (surj, surj-counter) = is-surjective(mapping, codomain)
+
+  if not inj and not surj {
+    return (false, "not injective and not surjective", (inj-counter, surj-counter))
+  } else if not inj {
+    return (false, "not injective", inj-counter)
+  } else if not surj {
+    return (false, "not surjective", surj-counter)
+  }
+
+  return (true, "bijective", none)
+}
+
+// Helper: build a function mapping from a callable and explicit domain
+// func: a function that takes one argument
+// domain: array of domain elements
+// Returns: dictionary mapping domain -> codomain
+#let function-from-callable(func, domain) = {
+  let mapping = (:)
+  for x in domain {
+    mapping.insert(str(x), func(x))
+  }
+  return mapping
+}
+
+// High-level function checker: check all properties of a callable function
+// func: a callable function (lambda or named function)
+// domain: array of domain elements to evaluate on
+// codomain: array of codomain elements (optional, defaults to none)
+// Returns: dictionary with keys "injective", "surjective", "bijective", "mapping", "details"
+#let check-function(func, domain, codomain: none) = {
+  // Build the mapping by evaluating func on domain
+  let mapping = function-from-callable(func, domain)
+
+  // Check injectivity
+  let (is_inj, inj_counter) = is-injective(mapping)
+
+  // Check surjectivity (only if codomain provided)
+  let is_surj = none
+  let surj_counter = none
+  if codomain != none {
+    (is_surj, surj_counter) = is-surjective(mapping, codomain)
+  }
+
+  // Check bijectivity (only if codomain provided)
+  let is_bij = none
+  let bij_reason = none
+  let bij_counter = none
+  if codomain != none {
+    (is_bij, bij_reason, bij_counter) = is-bijective(mapping, codomain)
+  }
+
+  return (
+    injective: is_inj,
+    surjective: is_surj,
+    bijective: is_bij,
+    mapping: mapping,
+    inj_counterexample: inj_counter,
+    surj_counterexample: surj_counter,
+    bij_details: (reason: bij_reason, counterexample: bij_counter),
+  )
+}
+
+// Display helper for function checker results
+#let show-function-check(result, func-name: "f") = {
+  let inj-text = if result.injective { [Injective: Yes] } else { [Injective: No] }
+  let surj-text = if result.surjective == none { [Surjective: Unknown (no codomain)] } else if result.surjective { [Surjective: Yes] } else { [Surjective: No] }
+  let bij-text = if result.bijective == none { [Bijective: Unknown (no codomain)] } else if result.bijective { [Bijective: Yes] } else { [Bijective: No] }
+
+  [
+    *Function #func-name:* #inj-text, #surj-text, #bij-text
+
+    #if result.inj_counterexample != none {
+      let (x1, x2, y) = result.inj_counterexample
+      [_Injectivity fails:_ $#func-name (#x1) = #func-name (#x2) = #y$]
+    }
+
+    #if result.surj_counterexample != none {
+      [_Surjectivity fails:_ unmapped elements: #{ result.surj_counterexample.map(x => $#x$).join(", ") }]
+    }
+  ]
 }
 
 = Key Formulas & Quick Reference
@@ -605,20 +735,69 @@
 
   #solution[
     *1. $f(x) = floor(log_2(x))$, $ZZ^+ -> NN$:*
-    - Surjective? Every $n in NN$ is hit by $x = 2^n$ (yes)
-    - Injective? $f(2) = f(3) = 1$ (no)
-    - #rect(inset: 4pt)[Surjective but not injective]
+    - Surjective? Every $n in NN$ is hit by $x = 2^n$. Yes
+    - Injective? $f(2) = f(3) = 1$. No
+    - *Surjective but not injective*
 
     *2. Alternating function $NN -> ZZ$:*
     - $f(0) = 0, f(1) = -1, f(2) = 1, f(3) = -2, f(4) = 2, ...$
-    - Surjective? Hits all of $ZZ$ (yes)
-    - Injective? Each output appears exactly once (yes)
-    - #rect(inset: 4pt)[Bijection]
+    - Surjective? Hits all of $ZZ$. Yes
+    - Injective? Each output appears exactly once. Yes
+    - *Bijection*
 
     *3. $f(x) = x^3 + 1$, $NN -> NN$:*
-    - Injective? $x^3$ is strictly increasing (yes)
-    - Surjective? $f(0) = 1, f(1) = 2, f(2) = 9, ...$ — skips 3,4,5,6,7,8 (no)
-    - #rect(inset: 4pt)[Injective but not surjective]
+    - Injective? $x^3$ is strictly increasing. Yes
+    - Surjective? $f(0) = 1, f(1) = 2, f(2) = 9, ...$ — skips 3,4,5,6,7,8. No
+    - *Injective but not surjective*
+  ]
+]
+
+=== Using the Function Checker
+
+#example(title: [Checking function properties with `check-function`])[
+  Verify properties of $f(x) = floor(log_2(x))$ on domain ${1,2,...,8}$ onto ${0,1,2,3}$:
+
+  #solution[
+    #let floor_log2 = (x) => {
+      if x <= 0 { return none }
+      calc.floor(calc.log(x, base: 2))
+    }
+    #let result = check-function(floor_log2, (1, 2, 3, 4, 5, 6, 7, 8), codomain: (0, 1, 2, 3))
+
+    #show-function-check(result, func-name: "f")
+
+    *Analysis:*
+    - Mapping: $f(1)=0, f(2)=1, f(3)=1, f(4)=2, f(5)=2, f(6)=2, f(7)=2, f(8)=3$
+    - Not injective because $f(2) = f(3) = 1$ (and others)
+    - Surjective because all outputs ${0,1,2,3}$ are hit
+
+    *More examples:*
+
+    #let sq_result = check-function((x) => x * x, (0, 1, 2, 3), codomain: (0, 1, 4, 9))
+    #let mod_result = check-function((x) => calc.rem(x, 5), (0, 1, 2, 3, 4), codomain: (0, 1, 2, 3, 4))
+    #let abs_result = check-function(calc.abs, (-2, -1, 0, 1, 2), codomain: (0, 1, 2))
+
+    #table(
+      columns: (1.5fr, 1fr, 1fr, 1fr),
+      stroke: 0.5pt,
+      inset: 6pt,
+      [*Function*],
+      [*Injective*],
+      [*Surjective*],
+      [*Bijective*],
+      [$f(x) = x^2$ on ${0,1,2,3}$ #linebreak() onto ${0,1,4,9}$],
+      [#{ if sq_result.injective [Yes] else [No] }],
+      [#{ if sq_result.surjective [Yes] else [No] }],
+      [#{ if sq_result.bijective [Yes] else [No] }],
+      [$f(x) = x mod 5$ on ${0,1,2,3,4}$],
+      [#{ if mod_result.injective [Yes] else [No] }],
+      [#{ if mod_result.surjective [Yes] else [No] }],
+      [#{ if mod_result.bijective [Yes] else [No] }],
+      [$f(x) = |x|$ on ${-2,-1,0,1,2}$ #linebreak() onto ${0,1,2}$],
+      [#{ if abs_result.injective [Yes] else [No] }],
+      [#{ if abs_result.surjective [Yes] else [No] }],
+      [#{ if abs_result.bijective [Yes] else [No] }],
+    )
   ]
 ]
 
@@ -1162,6 +1341,36 @@ Solve $a x equiv c pmod(m)$:
 
 #show-relation-properties((1, 2, 3), ((1, 1), (2, 2), (3, 3), (1, 2), (2, 3), (1, 3)), name: "R₂")
 
+== Function Property Checker
+
+Check if functions are injective/surjective/bijective on finite domains:
+
+#table(columns: (2fr, 3fr), stroke: 0.5pt, inset: 8pt, [*Usage*], [*Code*], [Define function], [```typst
+#let my_func = (x) => calc.floor(calc.log(x, base: 2))
+```], [Check properties], [```typst
+#let result = check-function(
+  my_func,
+  (1, 2, 3, 4, 5, 6, 7, 8),  // domain
+  codomain: (0, 1, 2, 3)      // codomain (optional)
+)
+```], [Display results], [```typst
+#show-function-check(result, func-name: "f")
+```])
+
+*Quick examples:*
+
+#let floor_log2 = (x) => calc.floor(calc.log(x, base: 2))
+#let r1 = check-function(floor_log2, (1, 2, 3, 4, 5, 6, 7, 8), codomain: (0, 1, 2, 3))
+- $f(x) = floor(log_2(x))$: Inj: #if r1.injective [Yes] else [No], Surj: #if r1.surjective [Yes] else [No], Bij: #if r1.bijective [Yes] else [No]
+
+#let r2 = check-function((x) => x * x, (0, 1, 2, 3), codomain: (0, 1, 4, 9))
+- $g(x) = x^2$ on ${0,1,2,3}$: Inj: #if r2.injective [Yes] else [No], Surj: #if r2.surjective [Yes] else [No], Bij: #if r2.bijective [Yes] else [No]
+
+#let r3 = check-function(calc.abs, (-2, -1, 0, 1, 2), codomain: (0, 1, 2))
+- $h(x) = |x|$ on ${-2,...,2}$: Inj: #if r3.injective [Yes] else [No], Surj: #if r3.surjective [Yes] else [No], Bij: #if r3.bijective [Yes] else [No]
+
+*Note:* Only works for finite domains. For infinite domains (ℤ, ℕ, ℝ), use mathematical proofs.
+
 == Your Calculations Here
 
 // Add your exam calculations below
@@ -1179,6 +1388,7 @@ Solve $a x equiv c pmod(m)$:
 // #show-binom(n, k)
 
 // Derangement:
+// #show-derangement(n)
 
 // Primality check:
 // #show-is-prime(n)
@@ -1191,7 +1401,6 @@ Solve $a x equiv c pmod(m)$:
 
 // Relation properties:
 // #show-relation-properties(S, R, name: "R")
-// #show-derangement(n)
 
 // Direct calculations using built-ins:
 // $ gcd(a, b) = #calc.gcd(a, b) $
