@@ -3,3 +3,7 @@
 *.log
 Assignments/
 python/
+
+# Solved exams (personal work, not committed)
+solved/*
+!solved/.gitkeep
