@@ -1,4 +1,6 @@
 name: PR Tests & Function Coverage
+permissions:
+  contents: read
 
 on:
   pull_request:
