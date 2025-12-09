@@ -85,6 +85,15 @@ typst compile tests.typ
 
 If compilation succeeds, all tests pass.
 
+### Adding New Functions
+
+When adding a new function to `Discrete_Cheat_Sheet.typ`:
+
+1. Implement the function in the main file
+2. Add corresponding test assertions in `tests.typ`
+3. Run `typst compile tests.typ` locally to verify tests pass
+4. Create a PR — the CI will verify test coverage before merge is allowed
+
 ---
 
 ## Language
@@ -107,13 +116,32 @@ Or use the Typst web app / VS Code extension for live preview.
 
 ## CI/CD
 
-This repository includes a GitHub Actions workflow that:
+This repository includes GitHub Actions workflows for continuous integration:
+
+### On Pull Requests (`pr-tests.yml`)
+
+Before any PR can be merged to `main`, the following checks must pass:
+
+1. **Function Test Coverage Check** — Verifies that every function defined in `Discrete_Cheat_Sheet.typ` has corresponding tests in `tests.typ`
+2. **Test Suite Execution** — Compiles `tests.typ` to run all assertions
+3. **Document Compilation** — Verifies the main document compiles without errors
+
+### On Push to Main (`build-release.yml`)
 
 1. Runs the test suite to validate all functions
 2. Compiles the document to PDF
 3. Creates a timestamped release with the PDF attached
 
 See the [Releases](https://github.com/SFSteffensen/01017-discrete-math-cheatsheet/releases) page for the latest PDF.
+
+### Branch Protection
+
+To enforce these checks, branch protection rules should be enabled on `main`:
+
+1. Go to **Settings** → **Branches**
+2. Add a branch protection rule for `main`
+3. Enable **Require status checks to pass before merging**
+4. Select both `Check Test Coverage for Functions` and `Run Typst Tests`
 
 ---
 
