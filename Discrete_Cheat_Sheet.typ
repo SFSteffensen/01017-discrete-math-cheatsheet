@@ -1221,6 +1221,284 @@ Check $d = 36 = 2^2 dot 3^2$:
   [Reflexive + Antisymmetric + Transitive],
 )
 
+#pagebreak()
+
+= Core Theorems & Lemmas (from Lectures)
+
+#rect(inset: 10pt, fill: purple.lighten(90%), width: 100%)[
+  *Note:* These theorems are organized by topic with lecture date references. Know these for the exam!
+]
+
+== Number Theory Theorems
+
+#theorem(title: "Fundamental Theorem of Arithmetic (Oct 2)")[
+  Every positive integer $n > 1$ can be factored into primes in a *unique way* (up to ordering).
+
+  $ n = p_1^(alpha_1) dot p_2^(alpha_2) dot dots.c dot p_k^(alpha_k) $
+]
+
+#theorem(
+  title: "Infinitude of Primes (Oct 2)",
+)[
+  There are infinitely many primes.
+
+  *Proof idea:* Assume finitely many primes $p_1, dots, p_n$. Consider $N = p_1 dot dots.c dot p_n + 1$. Then $N$ has a prime factor not in our list (contradiction).
+]
+
+#theorem(title: "Prime Factor Bound (Oct 2)")[
+  If $k = p_1 dot p_2 dot dots.c dot p_n$ (product of $n >= 2$ primes), then some $p_i <= sqrt(k)$.
+]
+
+#theorem(title: "Bézout's Identity (Oct 2)")[
+  For any $a, b in ZZ$, there exist integers $s, t in ZZ$ such that:
+  $ gcd(a, b) = s a + t b $
+
+  The integers $s$ and $t$ are called *Bézout coefficients*.
+]
+
+#theorem(
+  title: "Divisibility with Coprime Numbers (Oct 2)",
+)[
+  If $gcd(a, b) = 1$ and $a | b dot c$, then $a | c$.
+
+  *Proof:* Since $gcd(a, b)=1$, by Bézout: $1 = alpha a + beta b$. Multiply by $c$: $c = alpha a c + beta b c$. Since $a | b c$, we have $a | c$.
+]
+
+#theorem(title: "Cancellation Law in Modular Arithmetic (Oct 2)")[
+  If $gcd(a, m) = 1$, then:
+  $ a dot b equiv a dot c pmod(m) arrow.double b equiv c pmod(m) $
+
+  *Warning:* This does NOT hold if $gcd(a, m) != 1$.
+]
+
+#theorem(
+  title: "Modular Inverse Existence (Oct 9)",
+)[
+  If $a$ and $m$ are relatively prime (i.e., $gcd(a, m) = 1$), then an inverse of $a mod m$ exists and is unique $mod m$.
+
+  *Finding it:* Use Extended Euclidean Algorithm to find $s$ where $a s + m t = 1$, then $a^(-1) equiv s pmod(m)$.
+]
+
+#theorem(title: "Chinese Remainder Theorem (Oct 9)")[
+  Let $m_1, m_2, dots, m_n$ be pairwise relatively prime positive integers. The system:
+  $ x equiv a_1 pmod(m_1), quad x equiv a_2 pmod(m_2), quad dots, quad x equiv a_n pmod(m_n) $
+  has a unique solution modulo $M = m_1 dot m_2 dot dots.c dot m_n$.
+
+  *Formula:* $x = sum_(k=1)^n a_k M_k y_k$ where $M_k = M/m_k$ and $y_k equiv M_k^(-1) pmod(m_k)$.
+]
+
+#theorem(title: "Fermat's Little Theorem (Oct 9)")[
+  If $p$ is prime and $gcd(a, p) = 1$, then:
+  $ a^(p-1) equiv 1 pmod(p) $
+
+  Equivalently, for any integer $a$: $a^p equiv a pmod(p)$
+
+  *Application:* To compute $a^k mod p$, reduce exponent: $a^k equiv a^(k mod (p-1)) pmod(p)$
+]
+
+#definition(title: "Pseudoprime and Carmichael Number (Oct 9)")[
+  - *Pseudoprime to base $b$*: A composite $n$ with $b^(n-1) equiv 1 pmod(n)$
+  - *Carmichael number*: A composite $n$ that is a pseudoprime for ALL bases $b$ with $gcd(b, n)=1$
+
+  Example: $561 = 3 dot 11 dot 17$ is a Carmichael number.
+]
+
+== Counting & Combinatorics Theorems
+
+#theorem(
+  title: "Product Rule (Oct 30)",
+)[
+  If a procedure has two independent tasks with $n_1$ and $n_2$ ways respectively, the total ways is $n_1 dot n_2$.
+
+  *Extended:* For $m$ tasks: $n_1 dot n_2 dot dots.c dot n_m$ ways.
+]
+
+#theorem(title: "Sum Rule (Oct 30)")[
+  If a task can be done in $n_1$ ways OR in $n_2$ ways (disjoint), total ways is $n_1 + n_2$.
+]
+
+#theorem(title: "Subtraction Rule / Inclusion-Exclusion (Oct 30)")[
+  $ |A_1 union A_2| = |A_1| + |A_2| - |A_1 inter A_2| $
+]
+
+#theorem(
+  title: "Division Rule (Oct 30)",
+)[
+  If a procedure can be done in $n$ ways, but every outcome corresponds to exactly $d$ ways, there are $n/d$ distinct outcomes.
+
+  *Application:* Circular permutations of $n$ objects $= n!/n = (n-1)!$
+]
+
+#theorem(title: "Pigeonhole Principle (Oct 30)")[
+  If $k+1$ objects are placed into $k$ boxes, at least one box contains $>= 2$ objects.
+]
+
+#theorem(title: "Generalized Pigeonhole Principle (Oct 30)")[
+  If $N$ objects are placed into $k$ boxes, at least one box contains $>= ceil(N/k)$ objects.
+
+  *To guarantee $r$ objects in one box:* Need $N = k(r-1) + 1$ objects.
+]
+
+#theorem(title: "Binomial Theorem (Nov 6)")[
+  $ (x+y)^n = sum_(k=0)^n binom(n, k) x^(n-k) y^k $
+]
+
+#theorem(title: "Pascal's Identity (Nov 6)")[
+  $ binom(n, k) = binom(n-1, k) + binom(n-1, k-1) $
+]
+
+#theorem(title: "Vandermonde's Identity (Nov 6)")[
+  $ binom(m+n, r) = sum_(k=0)^r binom(m, k) binom(n, r-k) $
+
+  *Special case (sum of squares):* $binom(2n, n) = sum_(k=0)^n binom(n, k)^2$
+]
+
+#theorem(title: "Hockey Stick Identity (Nov 6)")[
+  $ binom(n+1, r+1) = sum_(k=r)^n binom(k, r) $
+
+  *Visual:* Sum diagonally down Pascal's triangle, result is one step down-right.
+]
+
+#definition(title: "Derangement Formula (Nov 13)")[
+  The number of permutations of $n$ elements with *no fixed points*:
+  $ D_n = n! sum_(k=0)^n (-1)^k / k! = n! [1 - 1/1! + 1/2! - 1/3! + dots + (-1)^n / n!] $
+
+  *Approximation:* $D_n approx n!/e approx 0.368 dot n!$
+]
+
+#theorem(
+  title: "Inclusion-Exclusion Principle (Nov 13)",
+)[
+  $ |A_1 union dots union A_n| = sum_(i)|A_i| - sum_(i<j)|A_i inter A_j| + sum_(i<j<k)|A_i inter A_j inter A_k| - dots + (-1)^(n+1)|A_1 inter dots inter A_n| $
+]
+
+== Induction Theorems
+
+#theorem(title: "Principle of Mathematical Induction (Oct 9/23)")[
+  To prove $P(n)$ for all $n >= n_0$:
+  1. *Base case:* Prove $P(n_0)$
+  2. *Inductive step:* Prove $P(k) arrow.double P(k+1)$ for all $k >= n_0$
+]
+
+#theorem(title: "Strong Induction (Oct 23)")[
+  To prove $P(n)$ for all $n >= n_0$:
+  1. *Base case:* Prove $P(n_0)$ (and possibly $P(n_0+1), dots$)
+  2. *Inductive step:* Prove $[P(n_0) and P(n_0+1) and dots and P(k)] arrow.double P(k+1)$
+
+  *Use when:* The proof of $P(k+1)$ requires $P(j)$ for some $j < k$.
+]
+
+#theorem(title: "Fibonacci Bound (Oct 23)")[
+  For $n >= 3$: $F_n > alpha^(n-2)$ where $alpha = (1+sqrt(5))/2$ (golden ratio).
+
+  *Key property:* $alpha^2 = alpha + 1$
+]
+
+== Relations & Partial Orders
+
+#theorem(title: "Equivalence Class Properties (Nov 20)")[
+  Let $tilde$ be an equivalence relation on $S$. For any $a, b in S$, the following are equivalent:
+  1. $a tilde b$
+  2. $[a]_tilde = [b]_tilde$
+  3. $[a]_tilde inter [b]_tilde != emptyset$
+]
+
+#theorem(title: "Partition Theorem (Nov 20)")[
+  The equivalence classes of an equivalence relation on $S$ form a *partition* of $S$:
+  - Every element belongs to exactly one equivalence class
+  - Distinct equivalence classes are disjoint
+  - The union of all equivalence classes equals $S$
+]
+
+== Graph Theory Theorems
+
+#lemma(name: "Handshaking Lemma (Nov 27)")[
+  In any graph: $ sum_(v in V(G)) deg(v) = 2 |E(G)| $
+
+  *Corollary:* The number of vertices with odd degree is always even.
+]
+
+#theorem(title: "Euler Circuit Theorem (Nov 27)")[
+  A connected graph has a closed Euler circuit if and only if *every vertex has even degree*.
+]
+
+#theorem(title: "Euler Path Theorem (Nov 27)")[
+  A connected graph has an Euler path if and only if it has *exactly 0 or 2 vertices of odd degree*.
+  - 0 odd vertices: Euler circuit (closed path)
+  - 2 odd vertices: Euler path starts/ends at the odd-degree vertices
+]
+
+#theorem(
+  title: "Hall's Marriage Theorem (Nov 27)",
+)[
+  A bipartite graph $G = (U union V, E)$ has a matching that covers all vertices in $U$ if and only if for every subset $S subset.eq U$:
+  $ |N(S)| >= |S| $
+  where $N(S)$ is the set of all neighbors of vertices in $S$.
+
+  *Hall's Condition:* Every subset of $k$ vertices in $U$ must collectively have at least $k$ neighbors in $V$.
+]
+
+#definition(
+  title: "Graph Isomorphism (Nov 27)",
+)[
+  Two graphs $G$ and $H$ are *isomorphic* ($G tilde.eq H$) if there exists a bijection $phi: V(G) -> V(H)$ that preserves adjacency:
+  $ {u, v} in E(G) arrow.l.r.double {phi(u), phi(v)} in E(H) $
+
+  *Necessary conditions (not sufficient):*
+  - Same number of vertices
+  - Same number of edges
+  - Same degree sequence
+]
+
+#definition(
+  title: "Bipartite Graph (Nov 27)",
+)[
+  A graph is *bipartite* if its vertices can be partitioned into two sets $U$ and $V$ such that every edge connects a vertex in $U$ to one in $V$.
+
+  *Characterization:* A graph is bipartite $arrow.l.r.double$ it contains no odd-length cycles.
+]
+
+#definition(title: "Tree (Nov 27)")[
+  A *tree* is a connected graph with no cycles.
+
+  *Properties:*
+  - A tree with $n$ vertices has exactly $n-1$ edges
+  - There is exactly one path between any two vertices
+  - Removing any edge disconnects the tree
+]
+
+== Additional Important Results
+
+#theorem(
+  title: "Erdős–Szekeres Theorem / Monotone Subsequences (Oct 30)",
+)[
+  Every sequence of $n^2 + 1$ distinct real numbers contains a monotone subsequence of length $n+1$ (either strictly increasing or strictly decreasing).
+
+  *Proof idea:* Associate each term with pair $(i_k, d_k)$ = (longest increasing from $k$, longest decreasing from $k$). If both $<= n$, at most $n^2$ pairs, but we have $n^2+1$ terms → contradiction by pigeonhole.
+]
+
+#theorem(
+  title: "Ramsey's Theorem R(3,3) = 6 (Oct 30)",
+)[
+  In any group of 6 people, there exist either 3 mutual friends or 3 mutual enemies.
+
+  *Proof:* Pick any person A. Of 5 others, $>= 3$ are friends OR $>= 3$ are enemies of A (pigeonhole with $ceil(5/2)=3$). If 3 are friends of A, either two of them are friends (giving 3 mutual friends with A), or all three are mutual enemies.
+]
+
+#theorem(title: "GCD Constraint on Products (Oct 2)")[
+  If $gcd(a, b) = d$, then $d^2 | a b$.
+
+  *Application:* Given $a b = N$, to check if $d$ can be $gcd(a, b)$, verify $d^2 | N$.
+]
+
+#theorem(title: "LCM-GCD Relationship (Oct 2)")[
+  $ gcd(a, b) dot "lcm"(a, b) = a dot b $
+
+  Using prime factorizations: $gcd$ takes minimum exponents, $"lcm"$ takes maximum exponents.
+]
+
+#pagebreak()
+
 = Additional Examples + Solutions
 
 #rect(inset: 8pt, fill: green.lighten(90%), width: 100%)[
