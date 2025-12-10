@@ -12,6 +12,87 @@
   semester: "2025 Fall",
 )
 
+// ═══════════════════════════════════════════════════════════════════════════════
+// EXAM STRATEGY GUIDE - Based on E24 Exam Analysis
+// ═══════════════════════════════════════════════════════════════════════════════
+
+= Exam Strategy Guide
+
+#rect(inset: 12pt, fill: blue.lighten(90%), width: 100%)[
+  *Key Exam Information:*
+  - One correct answer per question
+  - No negative points for wrong answers
+  - Always attempt every question!
+  - Use CAS tools (Typst functions, Wolfram Mathematica) to verify answers
+]
+
+== Question Type Recognition
+
+#table(
+  columns: (1fr, 1.5fr, 1.5fr),
+  stroke: 0.5pt,
+  inset: 6pt,
+  [*Question Type*],
+  [*Key Words/Patterns*],
+  [*Go-To Strategy*],
+  [Divisibility],
+  [$a|b$, $gcd$, $lcm$, prime factors],
+  [Factor decomposition, Euclid's lemma],
+  [Modular Arithmetic],
+  [$equiv$, $mod$, inverse],
+  [Extended Euclidean, CRT],
+  [Function Properties],
+  [injective, surjective, well-defined],
+  [Test values, check domain/codomain],
+  [Graph Theory],
+  [vertices, edges, $K_n$, $Q_n$, degree],
+  [Handshaking lemma, formulas],
+  [Combinatorics],
+  [count, choose, arrange, $(a+b)^n$],
+  [Binomial theorem, I-E],
+  [Relations],
+  [reflexive, symmetric, transitive],
+  [Check all pairs systematically],
+  [Partitions],
+  [disjoint, exhaustive, cover],
+  [Verify: no overlap + covers all],
+  [Induction],
+  [prove for all $n$],
+  [Base case + inductive step],
+)
+
+== Wolfram Mathematica Quick Reference
+
+#rect(inset: 8pt, fill: gray.lighten(90%), width: 100%)[
+*Essential Mathematica Commands for Exam:*
+```mathematica
+  (* Number Theory *)
+  GCD[a, b]                    (* Greatest common divisor *)
+  LCM[a, b]                    (* Least common multiple *)
+  ExtendedGCD[a, b]            (* Returns {gcd, {s, t}} where gcd = a*s + b*t *)
+  Mod[a, m]                    (* a mod m *)
+  PowerMod[a, -1, m]           (* Modular inverse of a mod m *)
+  ChineseRemainder[{r1,r2,...}, {m1,m2,...}]  (* CRT solver *)
+  PrimeQ[n]                    (* Is n prime? *)
+  FactorInteger[n]             (* Prime factorization *)
+  Divisors[n]                  (* All divisors of n *)
+
+  (* Combinatorics *)
+  Binomial[n, k]               (* n choose k *)
+  n!                           (* Factorial *)
+  Subfactorial[n]              (* Derangements D_n *)
+
+  (* Algebra *)
+  Expand[(a + b)^n]            (* Expand polynomial *)
+  Coefficient[expr, x^k]       (* Extract coefficient *)
+  PolynomialQuotientRemainder[p, q, x]  (* Polynomial division *)
+
+  (* Verification *)
+  Simplify[expr1 == expr2]     (* Check if expressions are equal *)
+  Table[f[x], {x, 1, n}]       (* Generate list of values *)
+  ```
+]
+
 // Typst built-in functions (calc module):
 // - calc.gcd(a, b) - Greatest Common Divisor
 // - calc.lcm(a, b) - Least Common Multiple
@@ -490,6 +571,538 @@
   ]
 }
 
+= Exam Question Types with E24 Examples
+
+== Type 1: Prime Divisibility & Product Divisibility (E24 Q1)
+
+#rect(inset: 8pt, fill: yellow.lighten(85%), width: 100%)[
+  *Pattern Recognition:* "If $a b | c d$, then which must be true?"
+]
+
+#example(title: [E24 Q1: Prime divisibility in products])[
+*Question:* If $a, b, c, d$ are positive integers such that $a b | c d$, which must be true?
+
+*Strategy:*
+1. $a b | c d$ means every prime factor in $a b$ appears in $c d$
+2. Use Euclid's Lemma: If prime $p | x y$, then $p|x$ or $p|y$
+
+*Typst Verification:*
+```typst
+  // Counterexample: a=6, b=1, c=2, d=3
+  #let a = 6; #let b = 1; #let c = 2; #let d = 3
+  #(a * b)  // = 6
+  #(c * d)  // = 6, so ab | cd ✓
+  #calc.gcd(a, b)  // = 1
+  #calc.gcd(c, d)  // = 1, but gcd(a,b)=6 does NOT divide gcd(c,d)=1
+  ```
+
+*Mathematica:*
+```mathematica
+  (* Verify counterexample *)
+  a = 6; b = 1; c = 2; d = 3;
+  Divisible[c*d, a*b]       (* True *)
+  Divisible[GCD[c,d], GCD[a,b]]  (* False - option 5 fails *)
+  ```
+
+*Answer:* "If $p$ is a prime that divides $a$, then $p|c$ or $p|d$" (by Euclid's Lemma)
+]
+
+== Type 2: Graph Edge Counting (E24 Q2, Q4, Q5)
+
+#rect(inset: 8pt, fill: yellow.lighten(85%), width: 100%)[
+  *Key Formulas:*
+  - Hypercube $Q_n$: vertices $= 2^n$, edges $= n dot 2^(n-1)$
+  - Complete graph $K_n$: edges $= binom(n, 2) = n(n-1)/2$
+  - Handshaking Lemma: $sum deg(v) = 2|E|$ (must be even!)
+]
+
+#example(title: [E24 Q2: Hypercube edges])[
+*Question:* For $n >= 4$, the number of edges in $Q_n$ is?
+
+*Quick Check:*
+- $Q_4$: $4 dot 2^3 = 32$ edges
+- $Q_5$: $5 dot 2^4 = 80$ edges
+
+*Typst:*
+```typst
+  #let hypercube-edges(n) = n * calc.pow(2, n - 1)
+  #hypercube-edges(4)  // = 32
+  #hypercube-edges(5)  // = 80
+  ```
+
+*Mathematica:*
+```mathematica
+  hypercubeEdges[n_] := n * 2^(n-1)
+  Table[hypercubeEdges[n], {n, 4, 8}]
+  (* {32, 80, 192, 448, 1024} *)
+  ```
+
+*Answer:* $n dot 2^(n-1)$
+]
+
+#example(title: [E24 Q4: Complete graph equivalences])[
+*Question:* Are these equal for $K_(2n)$? (a) $binom(2n, 2)$, (b) $2binom(n, 2) + n^2$, (c) $n(2n-1)$
+
+*Mathematica Verification:*
+```mathematica
+  n = 6;
+  a = Binomial[2n, 2]
+  b = 2*Binomial[n, 2] + n^2
+  c = n*(2n - 1)
+  a == b == c  (* True *)
+
+  (* Algebraic proof *)
+  Simplify[Binomial[2n, 2] - n*(2n-1)]  (* 0 *)
+  ```
+
+*Answer:* All three are equal
+]
+
+#example(title: [E24 Q5: Invalid degree sequence])[
+*Question:* Does a graph with degrees $2,2,3,3,3,3,3$ exist?
+
+*Strategy:* Sum of degrees must be EVEN (Handshaking Lemma)
+
+*Typst:*
+```typst
+  #let degrees = (2, 2, 3, 3, 3, 3, 3)
+  #degrees.fold(0, (a, x) => a + x)  // = 19 (ODD!)
+  ```
+
+*Mathematica:*
+```mathematica
+  Total[{2, 2, 3, 3, 3, 3, 3}]  (* 19 - odd, impossible! *)
+  ```
+
+*Answer:* Such a graph does NOT exist (odd sum violates handshaking lemma)
+]
+
+== Type 3: Function Properties (E24 Q3)
+
+#rect(inset: 8pt, fill: yellow.lighten(85%), width: 100%)[
+  *Checklist:*
+  1. *Well-defined?* Does every domain element map to exactly one codomain element?
+  2. *Injective?* Different inputs → different outputs? Find counterexample if not.
+  3. *Surjective?* Every codomain element is hit? Find unmapped element if not.
+]
+
+#example(title: [E24 Q3: Function classification])[
+*Function:* $f: ZZ^+ -> NN$ given by $f(x) = floor(log_2(x))$
+
+*Analysis:*
+- $f(1) = 0, f(2) = 1, f(3) = 1, f(4) = 2, ...$
+- Not injective: $f(2) = f(3) = 1$
+- Surjective: For any $n in NN$, $f(2^n) = n$
+
+*Typst Check:*
+```typst
+  #let f = (x) => calc.floor(calc.log(x, base: 2))
+  #(f(1), f(2), f(3), f(4), f(5), f(6), f(7), f(8))
+  // (0, 1, 1, 2, 2, 2, 2, 3)
+  ```
+
+*Mathematica:*
+```mathematica
+  f[x_] := Floor[Log2[x]]
+  Table[f[x], {x, 1, 10}]
+  (* {0, 1, 1, 2, 2, 2, 2, 3, 3, 3} *)
+  (* f[2] == f[3] → not injective *)
+  ```
+
+*Answer:* Surjective but not injective
+]
+
+#example(title: [E24 Q3: Well-defined check])[
+*Function:* $f: RR -> ZZ^+$ given by $f(x) = floor(|x|)$
+
+*Problem:* $f(0) = floor(0) = 0$, but $0 in.not ZZ^+$!
+
+*Typst:*
+```typst
+  #calc.floor(calc.abs(0))  // = 0, not in ℤ⁺
+  #calc.floor(calc.abs(0.5))  // = 0, not in ℤ⁺
+  ```
+
+*Answer:* NOT well-defined (outputs fall outside codomain)
+]
+
+== Type 4: Inclusion-Exclusion (E24 Q6)
+
+#rect(
+  inset: 8pt,
+  fill: yellow.lighten(85%),
+  width: 100%,
+)[
+  *Formula Pattern:* $|A_1 union ... union A_n| = sum|A_i| - sum|A_i inter A_j| + sum|A_i inter A_j inter A_k| - ...$
+
+  *Coefficient Pattern:* $binom(n, 1), -binom(n, 2), +binom(n, 3), -binom(n, 4), ...$
+]
+
+#example(title: [E24 Q6: Four sets with symmetric intersections])[
+*Given:* 4 sets, each has 200 elements, pairs share 50, triples share 25, all four share 5.
+
+*Formula:*
+$ |A union B union C union D| = 4(200) - 6(50) + 4(25) - 1(5) $
+
+*Typst:*
+```typst
+  #let ie4(singles, pairs, triples, quad) = {
+    4 * singles - 6 * pairs + 4 * triples - quad
+  }
+  #ie4(200, 50, 25, 5)  // = 595
+  ```
+
+*Mathematica:*
+```mathematica
+  ie4[s_, p_, t_, q_] := 4*s - 6*p + 4*t - q
+  ie4[200, 50, 25, 5]  (* 595 *)
+  ```
+
+*Answer:* 595
+]
+
+== Type 5: Modular Arithmetic & Cancellation (E24 Q7, Q8)
+
+#rect(inset: 8pt, fill: yellow.lighten(85%), width: 100%)[
+  *Cancellation Law:* $a c equiv b c pmod(m)$ and $gcd(c, m) = 1$ $arrow.double$ $a equiv b pmod(m)$
+
+  *Warning:* Cannot cancel if $gcd(c, m) != 1$!
+]
+
+#example(title: [E24 Q7: Congruence cancellation])[
+*Question:* If $a c equiv b c pmod(m)$, which must be true?
+
+*Key insight:* $m | c(a-b)$, but we can only cancel $c$ if $gcd(c, m) = 1$
+
+*Counterexample:* $2 dot 3 equiv 2 dot 6 pmod(6)$ (both $equiv 0$), but $3 equiv.not 6 pmod(6)$
+
+*Typst:*
+```typst
+  #calc.rem(2 * 3, 6)  // = 0
+  #calc.rem(2 * 6, 6)  // = 0
+  #calc.gcd(2, 6)  // = 2 ≠ 1, so can't cancel!
+  ```
+
+*Answer:* $a - b in {k m : k in ZZ}$ IF $gcd(c, m) = 1$
+]
+
+== Type 6: Partitions (E24 Q9)
+
+#rect(inset: 8pt, fill: yellow.lighten(85%), width: 100%)[
+  *Partition Requirements:*
+  1. *Disjoint:* No element in multiple sets
+  2. *Exhaustive:* Every element in at least one set
+]
+
+#example(title: [E24 Q9: Partitions of $ZZ times ZZ$])[
+  *Test each option by checking all 4 pair types:* (O,O), (O,E), (E,O), (E,E)
+
+  *Option (a):* "at least one odd" ∪ "both even"
+  - Set 1: (O,O), (O,E), (E,O) ← at least one odd
+  - Set 2: (E,E) ← both even
+  - Disjoint? ✓ Exhaustive? ✓ → *IS a partition*
+
+  *Option (b):* "both odd" ∪ "both even"
+  - Set 1: (O,O) only
+  - Set 2: (E,E) only
+  - Missing (O,E) and (E,O)! → *NOT a partition*
+
+  *Answer:* (a) is a partition but (b),(c) are not
+]
+
+== Type 7: Binomial Coefficients & Polynomial Expansion (E24 Q11)
+
+#rect(inset: 8pt, fill: yellow.lighten(85%), width: 100%)[
+  *General Term:* $(a + b)^n$ has term $binom(n, k) a^k b^(n-k)$
+
+  *Strategy:* Set up equations for exponents, solve for $k$, check consistency
+]
+
+#example(title: [E24 Q11: Coefficients in $(2x^2 - 3y^3)^8$])[
+*General term:* $binom(8, k)(2x^2)^k(-3y^3)^(8-k) = binom(8, k) 2^k (-3)^(8-k) x^(2k) y^(3(8-k))$
+
+*For $x^8 y^(12)$:*
+- Need $2k = 8 arrow.double k = 4$
+- Need $3(8-k) = 12 arrow.double k = 4$ ✓
+- Coefficient: $binom(8, 4) dot 2^4 dot (-3)^4 = 70 dot 16 dot 81$
+
+*For $x^6 y^9$:*
+- Need $2k = 6 arrow.double k = 3$
+- Need $3(8-k) = 9 arrow.double 8-k = 3 arrow.double k = 5$ ✗
+- Coefficient: *0* (impossible)
+
+*Mathematica:*
+```mathematica
+  Expand[(2x^2 - 3y^3)^8];
+  Coefficient[%, x^8 y^12]   (* 90720 = 70*16*81 *)
+  Coefficient[%, x^6 y^9]    (* 0 *)
+  ```
+
+*Answer:* $x^8 y^(12)$: $2^4 3^4 binom(8, 4)$; $x^6 y^9$: 0
+]
+
+== Type 8: Polynomial Divisibility (E24 Q12)
+
+#rect(inset: 8pt, fill: yellow.lighten(85%), width: 100%)[
+  *Key Theorem:* $(x - r) | p(x)$ iff $p(r) = 0$
+
+  *For $x + 1$:* Check if $p(-1) = 0$
+]
+
+#example(title: [E24 Q12: When does $x+1$ divide $x^n + 1$?])[
+*Evaluate at $x = -1$:*
+- $(-1)^n + 1 = 0$ iff $(-1)^n = -1$ iff $n$ is odd
+
+*Typst verification:*
+```typst
+  #for n in range(1, 7) {
+    let val = calc.pow(-1, n) + 1
+    [n=#n: #val #if val == 0 [(divisible)] else [(not divisible)] \ ]
+  }
+  ```
+
+*Mathematica:*
+```mathematica
+  Table[{n, (-1)^n + 1}, {n, 1, 10}]
+  (* n odd → 0, n even → 2 *)
+  ```
+
+*Answer:* Divisible for each odd $n >= 1$, and for no even $n$
+]
+
+== Type 9: Hall's Theorem / Bipartite Matching (E24 Q13)
+
+#rect(inset: 8pt, fill: yellow.lighten(85%), width: 100%)[
+  *Hall's Condition:* For every subset $S$ of one side, $|N(S)| >= |S|$
+]
+
+#example(
+  title: [E24 Q13: Minimum cables for computers to printers],
+)[
+  *Setup:* 10 computers, 5 printers. Any 5 computers must access 5 different printers.
+
+  *Analysis:* If printer $P$ connects to $< 6$ computers, we could pick 5 computers not connected to $P$, violating Hall's condition.
+
+  *Each printer needs $>= 6$ connections.*
+
+  *Minimum cables:* $5 times 6 = 30$
+
+  *Answer:* 30
+]
+
+== Type 10: Relation Properties (E24 Q14)
+
+#rect(inset: 8pt, fill: yellow.lighten(85%), width: 100%)[
+  *Classification:*
+  - *Equivalence:* Reflexive + Symmetric + Transitive
+  - *Partial Order:* Reflexive + Antisymmetric + Transitive
+]
+
+#example(title: [E24 Q14: Classify relations])[
+*For $R_1 = {(1,2),(2,3),(1,3),(4,5),(5,6),(4,6)}$:*
+
+*Typst Check:*
+```typst
+  #show-relation-properties(
+    (1, 2, 3, 4, 5, 6),
+    ((1, 2), (2, 3), (1, 3), (4, 5), (5, 6), (4, 6)),
+    name: [R_1]
+  )
+  ```
+
+- Reflexive: No (missing $(1,1), (2,2), ...$)
+- Symmetric: No ($(1,2)$ but no $(2,1)$)
+- Antisymmetric: Yes (no symmetric pairs with $x != y$)
+- Transitive: Yes ($(1,2),(2,3) arrow.double (1,3)$ ✓)
+
+*Answer:* Transitive and antisymmetric but not reflexive
+]
+
+== Type 11: Modular Inverse (E24 Q15)
+
+#rect(inset: 8pt, fill: yellow.lighten(85%), width: 100%)[
+  *Inverse exists iff $gcd(n, m) = 1$*
+
+  *Finding inverse:* Use Extended Euclidean Algorithm
+]
+
+#example(title: [E24 Q15: Inverses mod 9])[
+*Typst:*
+```typst
+  #show-mod-inverse(6, 9)  // Does not exist (gcd = 3)
+  #show-mod-inverse(2, 9)  // = 5 (since 2×5 = 10 ≡ 1)
+  #show-mod-inverse(7, 9)  // = 4 (since 7×4 = 28 ≡ 1)
+  ```
+
+*Mathematica:*
+```mathematica
+  PowerMod[6, -1, 9]   (* Error - no inverse *)
+  PowerMod[2, -1, 9]   (* 5 *)
+  PowerMod[7, -1, 9]   (* 4 *)
+  ```
+]
+
+== Type 12: Circular Permutations (E24 Q17)
+
+#rect(inset: 8pt, fill: yellow.lighten(85%), width: 100%)[
+  *Standard circular:* $(n-1)!$ (fix one position)
+
+  *If reflections are same:* $(n-1)!/2$
+]
+
+#example(title: [E24 Q17: Round table seatings])[
+  20 people around a table:
+
+  1. *Same left AND right neighbor:* Standard circular = $19!$
+  2. *Same two neighbors (direction ignored):* Divide by 2 = $19!/2$
+  3. *Same left neighbor only:* Still $19!$ (same as case 1)
+]
+
+== Type 13: Bézout's Identity (E24 Q18)
+
+#rect(inset: 8pt, fill: yellow.lighten(85%), width: 100%)[
+  *Key:* $gcd(a, b) = a s + b t$ for some integers $s, t$
+
+  *Corollary:* Any integer $k dot gcd(a, b)$ can be written as $a s + b t$
+]
+
+#example(title: [E24 Q18: Linear combinations])[
+  *Question:* Which CANNOT be written as $a s + b t$?
+
+  *Analysis:* Only multiples of $gcd(a, b)$ can be written as $a s + b t$.
+
+  $"lcm"(a,b)/gcd(a, b) = (a b)/(gcd(a, b)^2)$ is NOT necessarily a multiple of $gcd(a, b)$.
+
+  *Answer:* $"lcm"(a,b)/gcd(a, b)$
+]
+
+== Type 14: Chinese Remainder Theorem (E24 Q22)
+
+#rect(inset: 8pt, fill: yellow.lighten(85%), width: 100%)[
+  *Conditions:* Moduli must be pairwise coprime
+
+  *Solution is unique mod* $m_1 dot m_2 dot ... dot m_k$
+]
+
+#example(title: [E24 Q22: System of congruences])[
+*Solve:* $x equiv 1 pmod(2)$, $x equiv 4 pmod(5)$, $x equiv 3 pmod(7)$
+
+*Typst:*
+```typst
+  #crt-solve((1, 4, 3), (2, 5, 7))  // (59, 70)
+  ```
+
+*Mathematica:*
+```mathematica
+  ChineseRemainder[{1, 4, 3}, {2, 5, 7}]  (* 59 *)
+  ```
+
+*Verify:* $59 = 29(2)+1$, $59 = 11(5)+4$, $59 = 8(7)+3$ ✓
+
+*Answer:* ${59 + 70k : k in ZZ}$
+]
+
+== Type 15: GCD Constraints on Products (E24 Q24)
+
+#rect(inset: 8pt, fill: yellow.lighten(85%), width: 100%)[
+  *Key Theorem:* If $gcd(a, b) = d$, then $d^2 | a b$
+]
+
+#example(title: [E24 Q24: Impossible GCD values])[
+*Given:* $a b = 5292 = 2^2 dot 3^3 dot 7^2$
+
+*For $d = gcd(a, b)$, need $d^2 | 5292$*
+
+Check $d = 36 = 2^2 dot 3^2$:
+- $d^2 = 2^4 dot 3^4$
+- But $5292$ only has $2^2$, so $2^4 divides.not 2^2$ ✗
+
+*Mathematica:*
+```mathematica
+  FactorInteger[5292]  (* {{2,2}, {3,3}, {7,2}} *)
+  Divisible[5292, 36^2]  (* False *)
+  ```
+
+*Answer:* 36 cannot be the GCD
+]
+
+== Type 16: Proof by Induction (E24 Q25)
+
+#rect(inset: 8pt, fill: yellow.lighten(85%), width: 100%)[
+  *Structure:*
+  1. State what you're proving
+  2. Base case (usually $n=1$ or $n=0$)
+  3. Inductive hypothesis: "Assume true for $n$" or "for all $k <= n$"
+  4. Inductive step: Prove for $n+1$
+  5. Conclusion by principle of induction
+]
+
+#example(title: [E24 Q25: Graph edges by induction])[
+  *Prove:* Simple graph on $n$ vertices has at most $binom(n, 2)$ edges
+
+  *Correct fragment order:*
+  1. E: Base case ($n=1$, 0 edges $<= binom(1, 2) = 0$)
+  2. B: Inductive hypothesis (assume for some fixed $n >= 1$)
+  3. F: Remove vertex $v$, apply IH to remaining $n$ vertices
+  4. D: Count: at most $n + binom(n, 2) = binom(n+1, 2)$ edges
+  5. C: Conclusion by induction
+]
+
+== Type 17: Derangements (E24 Q21)
+
+#rect(inset: 8pt, fill: yellow.lighten(85%), width: 100%)[
+  *Formula:* $D_n = n! sum_(k=0)^n (-1)^k / k!$
+
+  *Values:* $D_0=1, D_1=0, D_2=1, D_3=2, D_4=9, D_5=44, D_6=265, D_7=1854$
+]
+
+#example(title: [E24 Q21: Constrained derangements])[
+*Question:* Derangements of ${1,...,7}$ ending with ${1,2,3}$ in some order
+
+*Analysis:*
+- Positions 5,6,7 must contain 1,2,3 (not in original places anyway) → $3!$ ways
+- Positions 1,2,3,4 must contain 4,5,6,7 with no element in its original place
+- But 4,5,6,7 going to positions 1,2,3,4 means only position 4 is "dangerous" for element 4
+
+*Count arrangements where 4 is NOT in position 4:*
+- Total: $4! = 24$
+- With 4 in position 4: $3! = 6$
+- Valid: $24 - 6 = 18 = 4! - 3!$
+
+*Total:* $3!(4! - 3!) = 6 times 18 = 108$
+
+*Typst:*
+```typst
+  #(calc.fact(3) * (calc.fact(4) - calc.fact(3)))  // = 108
+  ```
+]
+
+== Type 18: Balls into Boxes (E24 Q26)
+
+#rect(inset: 8pt, fill: yellow.lighten(85%), width: 100%)[
+  *Distinguishable balls, distinct boxes:*
+  - Total ways: $n^k$ (each of $k$ balls has $n$ choices)
+  - With constraints: Use inclusion-exclusion or direct counting
+]
+
+#example(title: [E24 Q26: $n+1$ balls into $n$ boxes])[
+*Total ways:* $n^(n+1)$
+
+*No box empty:* Choose 2 balls for one box (which gets 2), then assign: $binom(n+1, 2) dot n!$
+
+*At least one empty:* Total - No empty = $n^(n+1) - binom(n+1, 2) dot n!$
+
+*Mathematica:*
+```mathematica
+  n = 5;
+  total = n^(n+1)              (* 15625 *)
+  noEmpty = Binomial[n+1, 2] * n!  (* 1800 *)
+  atLeastOneEmpty = total - noEmpty  (* 13825 *)
+  ```
+]
+
+#pagebreak()
+
 = Key Formulas & Quick Reference
 
 == Number Theory
@@ -608,7 +1221,289 @@
   [Reflexive + Antisymmetric + Transitive],
 )
 
-= Examples + Solutions
+#pagebreak()
+
+= Core Theorems & Lemmas (from Lectures)
+
+#rect(inset: 10pt, fill: purple.lighten(90%), width: 100%)[
+  *Note:* These theorems are organized by topic with lecture date references. Know these for the exam!
+]
+
+== Number Theory Theorems
+
+#theorem(title: "Fundamental Theorem of Arithmetic (Oct 2)")[
+  Every positive integer $n > 1$ can be factored into primes in a *unique way* (up to ordering).
+
+  $ n = p_1^(alpha_1) dot p_2^(alpha_2) dot dots.c dot p_k^(alpha_k) $
+]
+
+#theorem(
+  title: "Infinitude of Primes (Oct 2)",
+)[
+  There are infinitely many primes.
+
+  *Proof idea:* Assume finitely many primes $p_1, dots, p_n$. Consider $N = p_1 dot dots.c dot p_n + 1$. Then $N$ has a prime factor not in our list (contradiction).
+]
+
+#theorem(title: "Prime Factor Bound (Oct 2)")[
+  If $k = p_1 dot p_2 dot dots.c dot p_n$ (product of $n >= 2$ primes), then some $p_i <= sqrt(k)$.
+]
+
+#theorem(title: "Bézout's Identity (Oct 2)")[
+  For any $a, b in ZZ$, there exist integers $s, t in ZZ$ such that:
+  $ gcd(a, b) = s a + t b $
+
+  The integers $s$ and $t$ are called *Bézout coefficients*.
+]
+
+#theorem(
+  title: "Divisibility with Coprime Numbers (Oct 2)",
+)[
+  If $gcd(a, b) = 1$ and $a | b dot c$, then $a | c$.
+
+  *Proof:* Since $gcd(a, b)=1$, by Bézout: $1 = alpha a + beta b$. Multiply by $c$: $c = alpha a c + beta b c$. Since $a | b c$, we have $a | c$.
+]
+
+#theorem(title: "Cancellation Law in Modular Arithmetic (Oct 2)")[
+  If $gcd(a, m) = 1$, then:
+  $ a dot b equiv a dot c pmod(m) arrow.double b equiv c pmod(m) $
+
+  *Warning:* This does NOT hold if $gcd(a, m) != 1$.
+]
+
+#theorem(
+  title: "Modular Inverse Existence (Oct 9)",
+)[
+  If $a$ and $m$ are relatively prime (i.e., $gcd(a, m) = 1$), then an inverse of $a mod m$ exists and is unique $mod m$.
+
+  *Finding it:* Use Extended Euclidean Algorithm to find $s$ where $a s + m t = 1$, then $a^(-1) equiv s pmod(m)$.
+]
+
+#theorem(title: "Chinese Remainder Theorem (Oct 9)")[
+  Let $m_1, m_2, dots, m_n$ be pairwise relatively prime positive integers. The system:
+  $ x equiv a_1 pmod(m_1), quad x equiv a_2 pmod(m_2), quad dots, quad x equiv a_n pmod(m_n) $
+  has a unique solution modulo $M = m_1 dot m_2 dot dots.c dot m_n$.
+
+  *Formula:* $x = sum_(k=1)^n a_k M_k y_k$ where $M_k = M/m_k$ and $y_k equiv M_k^(-1) pmod(m_k)$.
+]
+
+#theorem(title: "Fermat's Little Theorem (Oct 9)")[
+  If $p$ is prime and $gcd(a, p) = 1$, then:
+  $ a^(p-1) equiv 1 pmod(p) $
+
+  Equivalently, for any integer $a$: $a^p equiv a pmod(p)$
+
+  *Application:* To compute $a^k mod p$, reduce exponent: $a^k equiv a^(k mod (p-1)) pmod(p)$
+]
+
+#definition(title: "Pseudoprime and Carmichael Number (Oct 9)")[
+  - *Pseudoprime to base $b$*: A composite $n$ with $b^(n-1) equiv 1 pmod(n)$
+  - *Carmichael number*: A composite $n$ that is a pseudoprime for ALL bases $b$ with $gcd(b, n)=1$
+
+  Example: $561 = 3 dot 11 dot 17$ is a Carmichael number.
+]
+
+== Counting & Combinatorics Theorems
+
+#theorem(
+  title: "Product Rule (Oct 30)",
+)[
+  If a procedure has two independent tasks with $n_1$ and $n_2$ ways respectively, the total ways is $n_1 dot n_2$.
+
+  *Extended:* For $m$ tasks: $n_1 dot n_2 dot dots.c dot n_m$ ways.
+]
+
+#theorem(title: "Sum Rule (Oct 30)")[
+  If a task can be done in $n_1$ ways OR in $n_2$ ways (disjoint), total ways is $n_1 + n_2$.
+]
+
+#theorem(title: "Subtraction Rule / Inclusion-Exclusion (Oct 30)")[
+  $ |A_1 union A_2| = |A_1| + |A_2| - |A_1 inter A_2| $
+]
+
+#theorem(
+  title: "Division Rule (Oct 30)",
+)[
+  If a procedure can be done in $n$ ways, but every outcome corresponds to exactly $d$ ways, there are $n/d$ distinct outcomes.
+
+  *Application:* Circular permutations of $n$ objects $= n!/n = (n-1)!$
+]
+
+#theorem(title: "Pigeonhole Principle (Oct 30)")[
+  If $k+1$ objects are placed into $k$ boxes, at least one box contains $>= 2$ objects.
+]
+
+#theorem(title: "Generalized Pigeonhole Principle (Oct 30)")[
+  If $N$ objects are placed into $k$ boxes, at least one box contains $>= ceil(N/k)$ objects.
+
+  *To guarantee $r$ objects in one box:* Need $N = k(r-1) + 1$ objects.
+]
+
+#theorem(title: "Binomial Theorem (Nov 6)")[
+  $ (x+y)^n = sum_(k=0)^n binom(n, k) x^(n-k) y^k $
+]
+
+#theorem(title: "Pascal's Identity (Nov 6)")[
+  $ binom(n, k) = binom(n-1, k) + binom(n-1, k-1) $
+]
+
+#theorem(title: "Vandermonde's Identity (Nov 6)")[
+  $ binom(m+n, r) = sum_(k=0)^r binom(m, k) binom(n, r-k) $
+
+  *Special case (sum of squares):* $binom(2n, n) = sum_(k=0)^n binom(n, k)^2$
+]
+
+#theorem(title: "Hockey Stick Identity (Nov 6)")[
+  $ binom(n+1, r+1) = sum_(k=r)^n binom(k, r) $
+
+  *Visual:* Sum diagonally down Pascal's triangle, result is one step down-right.
+]
+
+#definition(title: "Derangement Formula (Nov 13)")[
+  The number of permutations of $n$ elements with *no fixed points*:
+  $ D_n = n! sum_(k=0)^n (-1)^k / k! = n! [1 - 1/1! + 1/2! - 1/3! + dots + (-1)^n / n!] $
+
+  *Approximation:* $D_n approx n!/e approx 0.368 dot n!$
+]
+
+#theorem(
+  title: "Inclusion-Exclusion Principle (Nov 13)",
+)[
+  $ |A_1 union dots union A_n| = sum_(i)|A_i| - sum_(i<j)|A_i inter A_j| + sum_(i<j<k)|A_i inter A_j inter A_k| - dots + (-1)^(n+1)|A_1 inter dots inter A_n| $
+]
+
+== Induction Theorems
+
+#theorem(title: "Principle of Mathematical Induction (Oct 9/23)")[
+  To prove $P(n)$ for all $n >= n_0$:
+  1. *Base case:* Prove $P(n_0)$
+  2. *Inductive step:* Prove $P(k) arrow.double P(k+1)$ for all $k >= n_0$
+]
+
+#theorem(title: "Strong Induction (Oct 23)")[
+  To prove $P(n)$ for all $n >= n_0$:
+  1. *Base case:* Prove $P(n_0)$ (and possibly $P(n_0+1), dots$)
+  2. *Inductive step:* Prove $[P(n_0) and P(n_0+1) and dots and P(k)] arrow.double P(k+1)$
+
+  *Use when:* The proof of $P(k+1)$ requires $P(j)$ for some $j < k$.
+]
+
+#theorem(title: "Fibonacci Bound (Oct 23)")[
+  For $n >= 3$: $F_n > alpha^(n-2)$ where $alpha = (1+sqrt(5))/2$ (golden ratio).
+
+  *Key property:* $alpha^2 = alpha + 1$
+]
+
+== Relations & Partial Orders
+
+#theorem(title: "Equivalence Class Properties (Nov 20)")[
+  Let $tilde$ be an equivalence relation on $S$. For any $a, b in S$, the following are equivalent:
+  1. $a tilde b$
+  2. $[a]_tilde = [b]_tilde$
+  3. $[a]_tilde inter [b]_tilde != emptyset$
+]
+
+#theorem(title: "Partition Theorem (Nov 20)")[
+  The equivalence classes of an equivalence relation on $S$ form a *partition* of $S$:
+  - Every element belongs to exactly one equivalence class
+  - Distinct equivalence classes are disjoint
+  - The union of all equivalence classes equals $S$
+]
+
+== Graph Theory Theorems
+
+#lemma(name: "Handshaking Lemma (Nov 27)")[
+  In any graph: $ sum_(v in V(G)) deg(v) = 2 |E(G)| $
+
+  *Corollary:* The number of vertices with odd degree is always even.
+]
+
+#theorem(title: "Euler Circuit Theorem (Nov 27)")[
+  A connected graph has a closed Euler circuit if and only if *every vertex has even degree*.
+]
+
+#theorem(title: "Euler Path Theorem (Nov 27)")[
+  A connected graph has an Euler path if and only if it has *exactly 0 or 2 vertices of odd degree*.
+  - 0 odd vertices: Euler circuit (closed path)
+  - 2 odd vertices: Euler path starts/ends at the odd-degree vertices
+]
+
+#theorem(
+  title: "Hall's Marriage Theorem (Nov 27)",
+)[
+  A bipartite graph $G = (U union V, E)$ has a matching that covers all vertices in $U$ if and only if for every subset $S subset.eq U$:
+  $ |N(S)| >= |S| $
+  where $N(S)$ is the set of all neighbors of vertices in $S$.
+
+  *Hall's Condition:* Every subset of $k$ vertices in $U$ must collectively have at least $k$ neighbors in $V$.
+]
+
+#definition(
+  title: "Graph Isomorphism (Nov 27)",
+)[
+  Two graphs $G$ and $H$ are *isomorphic* ($G tilde.eq H$) if there exists a bijection $phi: V(G) -> V(H)$ that preserves adjacency:
+  $ {u, v} in E(G) arrow.l.r.double {phi(u), phi(v)} in E(H) $
+
+  *Necessary conditions (not sufficient):*
+  - Same number of vertices
+  - Same number of edges
+  - Same degree sequence
+]
+
+#definition(
+  title: "Bipartite Graph (Nov 27)",
+)[
+  A graph is *bipartite* if its vertices can be partitioned into two sets $U$ and $V$ such that every edge connects a vertex in $U$ to one in $V$.
+
+  *Characterization:* A graph is bipartite $arrow.l.r.double$ it contains no odd-length cycles.
+]
+
+#definition(title: "Tree (Nov 27)")[
+  A *tree* is a connected graph with no cycles.
+
+  *Properties:*
+  - A tree with $n$ vertices has exactly $n-1$ edges
+  - There is exactly one path between any two vertices
+  - Removing any edge disconnects the tree
+]
+
+== Additional Important Results
+
+#theorem(
+  title: "Erdős–Szekeres Theorem / Monotone Subsequences (Oct 30)",
+)[
+  Every sequence of $n^2 + 1$ distinct real numbers contains a monotone subsequence of length $n+1$ (either strictly increasing or strictly decreasing).
+
+  *Proof idea:* Associate each term with pair $(i_k, d_k)$ = (longest increasing from $k$, longest decreasing from $k$). If both $<= n$, at most $n^2$ pairs, but we have $n^2+1$ terms → contradiction by pigeonhole.
+]
+
+#theorem(
+  title: "Ramsey's Theorem R(3,3) = 6 (Oct 30)",
+)[
+  In any group of 6 people, there exist either 3 mutual friends or 3 mutual enemies.
+
+  *Proof:* Pick any person A. Of 5 others, $>= 3$ are friends OR $>= 3$ are enemies of A (pigeonhole with $ceil(5/2)=3$). If 3 are friends of A, either two of them are friends (giving 3 mutual friends with A), or all three are mutual enemies.
+]
+
+#theorem(title: "GCD Constraint on Products (Oct 2)")[
+  If $gcd(a, b) = d$, then $d^2 | a b$.
+
+  *Application:* Given $a b = N$, to check if $d$ can be $gcd(a, b)$, verify $d^2 | N$.
+]
+
+#theorem(title: "LCM-GCD Relationship (Oct 2)")[
+  $ gcd(a, b) dot "lcm"(a, b) = a dot b $
+
+  Using prime factorizations: $gcd$ takes minimum exponents, $"lcm"$ takes maximum exponents.
+]
+
+#pagebreak()
+
+= Additional Examples + Solutions
+
+#rect(inset: 8pt, fill: green.lighten(90%), width: 100%)[
+  *Tip:* The examples below complement the exam question types above. Use both sections together!
+]
 
 == Number Theory
 
@@ -1398,6 +2293,161 @@ Check if functions are injective/surjective/bijective on finite domains:
 
 // General linear congruence ax ≡ c (mod m):
 // #show-solve-congruence(a, c, m)
+
+#pagebreak()
+
+= Wolfram Mathematica Complete Reference
+
+#rect(inset: 8pt, fill: orange.lighten(85%), width: 100%)[
+  *Copy-paste ready code for your exam!* Open Mathematica and use these.
+]
+
+== Number Theory Commands
+
+```mathematica
+(* === GCD, LCM, and Bézout === *)
+GCD[48, 18]                          (* 6 *)
+LCM[12, 18]                          (* 36 *)
+ExtendedGCD[48, 18]                  (* {6, {-1, 3}} means 6 = 48*(-1) + 18*3 *)
+
+(* === Modular Arithmetic === *)
+Mod[17, 5]                           (* 2 *)
+PowerMod[3, 100, 7]                  (* 3^100 mod 7 *)
+PowerMod[5, -1, 17]                  (* Modular inverse: 5^(-1) mod 17 = 7 *)
+
+(* === Chinese Remainder Theorem === *)
+ChineseRemainder[{1, 4, 3}, {2, 5, 7}]   (* 59 *)
+
+(* === Primality === *)
+PrimeQ[97]                           (* True *)
+FactorInteger[5292]                  (* {{2, 2}, {3, 3}, {7, 2}} *)
+Divisors[28]                         (* {1, 2, 4, 7, 14, 28} *)
+Prime[100]                           (* 541 - the 100th prime *)
+PrimePi[100]                         (* 25 - count of primes ≤ 100 *)
+
+(* === Euler's Totient === *)
+EulerPhi[12]                         (* 4 *)
+```
+
+== Combinatorics Commands
+
+```mathematica
+(* === Basic Counting === *)
+Binomial[10, 3]                      (* 120 *)
+10!                                  (* 3628800 *)
+Multinomial[3, 2, 2]                 (* 7!/(3!2!2!) = 210 *)
+
+(* === Derangements === *)
+Subfactorial[5]                      (* 44 *)
+Subfactorial[7]                      (* 1854 *)
+
+(* === Stirling Numbers === *)
+StirlingS2[5, 3]                     (* Partitions of 5 into 3 non-empty subsets *)
+
+(* === Permutations and Combinations === *)
+Permutations[{a, b, c}]              (* All 6 permutations *)
+Subsets[{1, 2, 3, 4}, {2}]           (* All 2-element subsets *)
+```
+
+== Polynomial Operations
+
+```mathematica
+(* === Expansion === *)
+Expand[(2x^2 - 3y^3)^8]
+
+(* === Extract Coefficient === *)
+Coefficient[Expand[(2x^2 - 3y^3)^8], x^8 y^12]   (* 90720 *)
+
+(* === Polynomial Division === *)
+PolynomialQuotientRemainder[x^4 + 3x^3 + 5x/2 + 6, x + 2, x]
+
+(* === Divisibility Check === *)
+PolynomialRemainder[x^5 + 1, x + 1, x]   (* 0 means divisible *)
+```
+
+== Graph Theory Calculations
+
+```mathematica
+(* === Hypercube Q_n === *)
+hypercubeVertices[n_] := 2^n
+hypercubeEdges[n_] := n * 2^(n-1)
+
+(* === Complete Graph K_n === *)
+completeEdges[n_] := n(n-1)/2
+
+(* === Verify Degree Sequence === *)
+degreeSequence = {2, 2, 3, 3, 3, 3, 3};
+Total[degreeSequence]                (* 19 - odd, so invalid! *)
+EvenQ[Total[degreeSequence]]         (* False *)
+```
+
+== Inclusion-Exclusion Templates
+
+```mathematica
+(* === 2 Sets === *)
+ie2[a_, b_, ab_] := a + b - ab
+
+(* === 3 Sets === *)
+ie3[a_, b_, c_, ab_, ac_, bc_, abc_] := a + b + c - ab - ac - bc + abc
+
+(* === 4 Sets (symmetric case) === *)
+ie4[single_, pair_, triple_, quad_] := 4*single - 6*pair + 4*triple - quad
+ie4[200, 50, 25, 5]                  (* 595 *)
+```
+
+== Relation Property Checker
+
+```mathematica
+(* Define a relation as list of pairs *)
+R = {{1,2}, {2,3}, {1,3}, {4,5}, {5,6}, {4,6}};
+S = {1, 2, 3, 4, 5, 6};
+
+(* Reflexive: all (x,x) present? *)
+reflexiveQ[set_, rel_] := AllTrue[set, MemberQ[rel, {#, #}] &]
+reflexiveQ[S, R]                     (* False *)
+
+(* Symmetric: (x,y) ∈ R ⟹ (y,x) ∈ R? *)
+symmetricQ[rel_] := AllTrue[rel, MemberQ[rel, Reverse[#]] &]
+symmetricQ[R]                        (* False *)
+
+(* Antisymmetric: (x,y) ∈ R ∧ (y,x) ∈ R ⟹ x = y? *)
+antisymmetricQ[rel_] := !AnyTrue[rel, (#[[1]] != #[[2]] && MemberQ[rel, Reverse[#]]) &]
+antisymmetricQ[R]                    (* True *)
+
+(* Transitive: (x,y) ∈ R ∧ (y,z) ∈ R ⟹ (x,z) ∈ R? *)
+transitiveQ[rel_] := AllTrue[
+  Tuples[rel, 2],
+  (#[[1, 2]] != #[[2, 1]] || MemberQ[rel, {#[[1, 1]], #[[2, 2]]}]) &
+]
+```
+
+== Quick Verification Templates
+
+```mathematica
+(* === Verify CRT Solution === *)
+x = 59; moduli = {2, 5, 7}; remainders = {1, 4, 3};
+Table[Mod[x, moduli[[i]]] == remainders[[i]], {i, 3}]
+(* {True, True, True} *)
+
+(* === Check if d can be gcd(a,b) given ab = N === *)
+canBeGCD[d_, N_] := Divisible[N, d^2]
+canBeGCD[36, 5292]                   (* False *)
+canBeGCD[42, 5292]                   (* True *)
+
+(* === Function injectivity check on finite domain === *)
+f[x_] := Floor[Log2[x]]
+domain = Range[1, 8];
+image = f /@ domain;
+Length[image] == Length[DeleteDuplicates[image]]  (* False - not injective *)
+```
+
+#rect(inset: 12pt, fill: blue.lighten(90%), width: 100%)[
+  *Good luck on your exam!* Remember:
+  - Always attempt every question (no negative points)
+  - Use these tools to verify your work
+  - When stuck, try small examples first
+  - Check your arithmetic with CAS tools
+]
 
 // Relation properties:
 // #show-relation-properties(S, R, name: "R")
