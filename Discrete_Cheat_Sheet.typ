@@ -2305,14 +2305,13 @@ Check if functions are injective/surjective/bijective on finite domains:
 - Right: `Coefficient[Expand[(2x^3 - y^4)^10], x^15 y^20]`
 ]
 
-== Euler's Totient Function
+== Euler's Totient Function (2025 Q1)
 
 #rect(inset: 8pt, fill: yellow.lighten(85%), width: 100%)[
   *Formula:* For distinct primes $p, q$: $phi(p q) = (p-1)(q-1) = p q - p - q + 1$
 ]
 
-#example(
-  title: [φ(pq) for distinct primes],
+#example(title: [2025 Q1: φ(pq) for primes p < q])
 )[
 *Question:* If $p,q$ are primes with $100 < p < q$, how many positive integers less than $p q$ are relatively prime to $p q$?
 
@@ -2337,9 +2336,9 @@ $ phi(p q) = (p-1)(q-1) = p q - p - q + 1 $
 *Answer:* $p q - p - q + 1$ (Option 1)
 ]
 
-== Modular Exponentiation
+== Modular Exponentiation (2025 Q2)
 
-#example(title: [Nested modular exponentiation: $(4^100 mod 6)^100 mod 10$])[
+#example(title: [2025 Q2: $(4^100 mod 6)^100 mod 10$])[
 *Step-by-step:*
 1. First: $4^100 mod 6$
 2. Then: $(text("result"))^100 mod 10$
@@ -2360,7 +2359,7 @@ $ phi(p q) = (p-1)(q-1) = p q - p - q + 1 $
 *Answer:* 6 (Option 2)
 ]
 
-== Subset Counting with Parity Constraints
+== Subset Counting with Parity Constraints (2025 Q3)
 
 #rect(
   inset: 8pt,
@@ -2374,7 +2373,7 @@ $ phi(p q) = (p-1)(q-1) = p q - p - q + 1 $
   For $n$ even elements: $2^(n-1)$ subsets with odd count, $2^(n-1)$ with even count.
 ]
 
-#example(title: [Subsets of {1,...,99} with parity constraints])[
+#example(title: [2025 Q3: Subsets of {1,...,99}])[
 *Setup:* {1,...,99} has 50 odd numbers and 49 even numbers.
 
 *Part a: Odd # of odds AND even # of evens*
@@ -2409,9 +2408,9 @@ $ phi(p q) = (p-1)(q-1) = p q - p - q + 1 $
   ```
 ]
 
-== Chinese Remainder Theorem
+== Chinese Remainder Theorem (2025 Q4)
 
-#example(title: [Solve system of congruences])[
+#example(title: [2025 Q4: Solve system of congruences])[
 *System:*
 $ x &equiv 1 pmod(2) \
 x &equiv 1 pmod(5) \
@@ -2436,9 +2435,9 @@ x &equiv 7 pmod(9) $
 *Answer:* ${61 + 90k | k in ZZ}$ (Option 5)
 ]
 
-== Polynomial GCD
+== Polynomial GCD (2025 Q5)
 
-#example(title: [GCD of $x^3 - 1$ and $x^3 + 2x^2 + 2x + 1$])[
+#example(title: [2025 Q5: GCD of $x^3 - 1$ and $x^3 + 2x^2 + 2x + 1$])[
 *SymPy:*
 ```python
   from sympy import Symbol, gcd, factor
@@ -2460,7 +2459,7 @@ x &equiv 7 pmod(9) $
 *Answer:* $x^2 + x + 1$ (Option 4)
 ]
 
-== Induction Proof Structure
+== Induction Proof Structure (2025 Q6)
 
 #rect(inset: 8pt, fill: yellow.lighten(85%), width: 100%)[
   *Standard Induction Proof Order:*
@@ -2470,7 +2469,7 @@ x &equiv 7 pmod(9) $
   4. *Conclusion*: Invoke principle of mathematical induction
 ]
 
-#example(title: [Prove $f(n) = (n+1)! - 1$ where $f(n) = sum_(k=0)^n k dot k!$])[
+#example(title: [2025 Q6: Prove $f(n) = (n+1)! - 1$])[
   *Statement:* $f(n) = sum_(k=0)^n k dot k! = (n+1)! - 1$
 
   *Correct fragment order:*
@@ -2487,9 +2486,9 @@ x &equiv 7 pmod(9) $
   *Answer:* F, B, H, D
 ]
 
-== Recursive Sequence
+== Recursive Sequence (2025 Q7)
 
-#example(title: [Compute terms of a piecewise recurrence])[
+#example(title: [2025 Q7: Compute $a_n$])[
 *Recurrence:*
 $ a_0 = 2, quad a_1 = 3 $
 $ a_n = cases(a_(n-1) + n & "if" n "even", a_(n-1) + 2a_(n-2) & "if" n "odd") $
@@ -2510,7 +2509,7 @@ $ a_n = cases(a_(n-1) + n & "if" n "even", a_(n-1) + 2a_(n-2) & "if" n "odd") $
 *Answer:* 37 (Option 1)
 ]
 
-== Bipartite Graph Degree Sequences
+== Bipartite Graph Degree Sequences (2025 Q8)
 
 #rect(
   inset: 8pt,
@@ -2520,7 +2519,7 @@ $ a_n = cases(a_(n-1) + n & "if" n "even", a_(n-1) + 2a_(n-2) & "if" n "odd") $
   *CRITICAL:* In a bipartite graph, the sum of degrees on BOTH sides must be EQUAL (both equal the number of edges).
 ]
 
-#example(title: [Checking bipartite graph existence from degree sequences])[
+#example(title: [2025 Q8: Bipartite graph existence])[
 *Part a:* $V_1 = [4,4,4,4]$, $V_2 = [5,5,5,5,5]$
 - Sum of $V_1$: $16$, Sum of $V_2$: $25$
 - $16 != 25$ → *Graph does NOT exist*
@@ -2547,7 +2546,7 @@ $ a_n = cases(a_(n-1) + n & "if" n "even", a_(n-1) + 2a_(n-2) & "if" n "odd") $
   ```
 ]
 
-== Vandermonde's Identity
+== Vandermonde's Identity (2025 Q9)
 
 #rect(inset: 8pt, fill: yellow.lighten(85%), width: 100%)[
   *Vandermonde:* $binom(m+n, r) = sum_(k=0)^r binom(m, r-k) binom(n, k)$
@@ -2555,7 +2554,7 @@ $ a_n = cases(a_(n-1) + n & "if" n "even", a_(n-1) + 2a_(n-2) & "if" n "odd") $
   *Non-zero terms:* $max(0, r-m) <= k <= min(r, n)$
 ]
 
-#example(title: [Finding valid summation bounds])[
+#example(title: [2025 Q9: Lower bound of summation])[
   *Given:* $0 < m < r < n$
 
   For $binom(m, r-k)$ to be non-zero: $0 <= r-k <= m$, i.e., $r-m <= k <= r$
@@ -2569,9 +2568,9 @@ $ a_n = cases(a_(n-1) + n & "if" n "even", a_(n-1) + 2a_(n-2) & "if" n "odd") $
   *Answer:* $a = r - m$ (Option 6)
 ]
 
-== Set Operations
+== Set Operations (2025 Q10)
 
-#example(title: [Evaluate $((A sect B) backslash C) union ((B sect C) backslash A) union ((C sect A) backslash B)$])[
+#example(title: [2025 Q10: $((A sect B) backslash C) union ((B sect C) backslash A) union ((C sect A) backslash B)$])[
 *Given:* $A = {0,1,2,4}$, $B = {0,1,3,5}$, $C = {0,2,3,6}$
 
 *SymPy:*
@@ -2595,27 +2594,26 @@ $ a_n = cases(a_(n-1) + n & "if" n "even", a_(n-1) + 2a_(n-2) & "if" n "odd") $
 *Answer:* ${1, 2, 3}$ (Option 7)
 ]
 
-== Predicate Logic Translation
+== Predicate Logic Translation (2025 Q11)
 
 #rect(inset: 8pt, fill: red.lighten(85%), width: 100%)[
   *Key:* Mathematical statements CAN be translated to predicate logic. Don't give up!
 ]
 
-#example(
-  title: ["Every positive rational has coprime representation"],
+#example(title: [2025 Q11: "Every positive rational has coprime representation"])
 )[
-  *Statement:* For every positive rational $x$, there exist positive integers $a, b$ such that $x = a/b$ and $gcd(a, b) = 1$.
+*Statement:* For every positive rational $x$, there exist positive integers $a, b$ such that $x = a/b$ and $gcd(a, b) = 1$.
 
-  *Translation:* $forall x in QQ^+ exists a in ZZ^+ exists b in ZZ^+ (x = a/b and G(a,b))$
+*Translation:* $forall x in QQ^+ exists a in ZZ^+ exists b in ZZ^+ (x = a/b and G(a,b))$
 
-  This is exactly Option 2!
+This is exactly Option 2!
 
-  *Answer:* Option 2
+*Answer:* Option 2
 ]
 
-== Set Algebra
+== Set Algebra (2025 Q12)
 
-#example(title: [Simplify $A sect overline((B backslash C))$])[
+#example(title: [2025 Q12: $A sect overline((B backslash C))$])[
   *Simplify:*
   $ A sect overline((B backslash C)) &= A sect overline((B sect overline(C))) \
                                    &= A sect (overline(B) union C) quad "(De Morgan)" \
@@ -2626,9 +2624,9 @@ $ a_n = cases(a_(n-1) + n & "if" n "even", a_(n-1) + 2a_(n-2) & "if" n "odd") $
   *NOT* $A sect (C backslash B)$ which equals $A sect C sect overline(B)$
 ]
 
-== Tautologies
+== Tautologies (2025 Q14)
 
-#example(title: [Checking if a formula is a tautology])[
+#example(title: [2025 Q14: Which is a tautology?])[
 *SymPy:*
 ```python
   from itertools import product
@@ -2652,7 +2650,7 @@ $ a_n = cases(a_(n-1) + n & "if" n "even", a_(n-1) + 2a_(n-2) & "if" n "odd") $
 *Answer:* Option 5: $(not p or not q) -> not(p and q)$
 ]
 
-== Circular Permutations
+== Circular Permutations (2025 Q15)
 
 #rect(inset: 8pt, fill: yellow.lighten(85%), width: 100%)[
   *Circular arrangements of $n$ people:*
@@ -2660,7 +2658,7 @@ $ a_n = cases(a_(n-1) + n & "if" n "even", a_(n-1) + 2a_(n-2) & "if" n "odd") $
   - Unoriented (only neighbors matter): $(n-1)!/2$
 ]
 
-#example(title: [Seating $3n$ people at two circular tables])[
+#example(title: [2025 Q15: Two tables with n and 2n seats])[
 *Setup:* $3n$ people, tables with $n$ and $2n$ seats.
 
 *Part a: Same left AND right neighbors*
@@ -2684,7 +2682,7 @@ $ a_n = cases(a_(n-1) + n & "if" n "even", a_(n-1) + 2a_(n-2) & "if" n "odd") $
   ```
 ]
 
-== Function Properties
+== Function Properties (2025 Q16)
 
 #rect(inset: 8pt, fill: red.lighten(85%), width: 100%)[
   *Check list:*
@@ -2693,7 +2691,7 @@ $ a_n = cases(a_(n-1) + n & "if" n "even", a_(n-1) + 2a_(n-2) & "if" n "odd") $
   3. *Surjective:* Every codomain element is hit
 ]
 
-#example(title: [Analyzing well-defined, injective, surjective])[
+#example(title: [2025 Q16: Function property analysis])[
   *f: ℝ → ℤ, f(x) = 2⌊x/2⌋*
   - Well-defined? Yes! Always produces an even integer.
   - Injective? No: $f(0) = f(1) = 0$
@@ -2722,9 +2720,9 @@ $ a_n = cases(a_(n-1) + n & "if" n "even", a_(n-1) + 2a_(n-2) & "if" n "odd") $
   - *Answer:* Both injective AND surjective (Option 5)
 ]
 
-== Permutations with Forbidden Patterns
+== Permutations with Forbidden Patterns (2025 Q17)
 
-#example(title: [Counting permutations of ABCDE with constraints])[
+#example(title: [2025 Q17: Permutations of ABCDE])[
 *SymPy (brute force):*
 ```python
   from itertools import permutations
@@ -2750,7 +2748,7 @@ $ a_n = cases(a_(n-1) + n & "if" n "even", a_(n-1) + 2a_(n-2) & "if" n "odd") $
 *Answers:* (a) 64, (b) 6, (c) 36
 ]
 
-== Relation Properties
+== Relation Properties (2025 Q18)
 
 #rect(inset: 8pt, fill: yellow.lighten(85%), width: 100%)[
   *Definitions on set S:*
@@ -2765,7 +2763,7 @@ $ a_n = cases(a_(n-1) + n & "if" n "even", a_(n-1) + 2a_(n-2) & "if" n "odd") $
   - *Hasse Diagram Edges:* Covering relations of a partial order (not the full order!)
 ]
 
-#example(title: [Classifying relations on {a,b,c,d}])[
+#example(title: [2025 Q18: Classify relations on {a,b,c,d}])[
   *R₁ = {(a,a),(a,b),(a,c),(a,d)}*
   - Not reflexive (missing (b,b), (c,c), (d,d))
   - *Answer:* None of these (Option 5)
@@ -2790,7 +2788,7 @@ $ a_n = cases(a_(n-1) + n & "if" n "even", a_(n-1) + 2a_(n-2) & "if" n "odd") $
   - *Answer:* Well-order (Option 4)
 ]
 
-== Polynomial Coefficients — CRITICAL!
+== Polynomial Coefficients (2025 Q20) — CRITICAL!
 
 #rect(inset: 12pt, fill: red.lighten(85%), width: 100%)[
 *COMMON WOLFRAM MISTAKE:*
@@ -2803,7 +2801,7 @@ $ a_n = cases(a_(n-1) + n & "if" n "even", a_(n-1) + 2a_(n-2) & "if" n "odd") $
   ```
 ]
 
-#example(title: [Finding coefficient of $x^15 y^20$ in polynomial expansions])[
+#example(title: [2025 Q20: Coefficient of $x^15 y^20$])[
 *General approach:* $(a x^m + b y^n)^N$ has term $binom(N, k) a^(N-k) b^k x^(m(N-k)) y^(n k)$
 
 *$(2x^3 - y^4)^10$:*
@@ -2848,9 +2846,9 @@ $ a_n = cases(a_(n-1) + n & "if" n "even", a_(n-1) + 2a_(n-2) & "if" n "odd") $
 *Answer for all three:* $-binom(10, 5) dot 2^5$ (Option 1)
 ]
 
-== Logical Equivalence
+== Logical Equivalence (2025 Q21)
 
-#example(title: [Equivalent forms of "$a$ and $b$ are relatively prime"])[
+#example(title: [2025 Q21: "$a$ and $b$ are relatively prime"])[
   *Statement:* $gcd(a, b) = 1$, i.e., no common divisor $> 1$
 
   *Three equivalent formulations:*
