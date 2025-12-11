@@ -2311,7 +2311,8 @@ Check if functions are injective/surjective/bijective on finite domains:
   *Formula:* For distinct primes $p, q$: $phi(p q) = (p-1)(q-1) = p q - p - q + 1$
 ]
 
-#example(title: [2025 Q1: φ(pq) for primes p < q])
+#example(
+  title: [2025 Q1: φ(pq) for primes p < q],
 )[
 *Question:* If $p,q$ are primes with $100 < p < q$, how many positive integers less than $p q$ are relatively prime to $p q$?
 
@@ -2376,15 +2377,15 @@ $ phi(p q) = (p-1)(q-1) = p q - p - q + 1 $
 #example(title: [2025 Q3: Subsets of {1,...,99}])[
 *Setup:* {1,...,99} has 50 odd numbers and 49 even numbers.
 
-*Part a: Odd # of odds AND even # of evens*
-- Odd # from 50 odds: $2^(50-1) = 2^49$ ways
-- Even # from 49 evens: $2^(49-1) = 2^48$ ways
+*Part a: Odd \# of odds AND even \# of evens*
+- Odd \# from 50 odds: $2^(50-1) = 2^49$ ways
+- Even \# from 49 evens: $2^(49-1) = 2^48$ ways
 - Total: $2^49 times 2^48 = 2^97$
 - *Answer:* $2^97$
 
-*Part b: Odd # of evens AND even # of odds*
-- Odd # from 49 evens: $2^48$ ways
-- Even # from 50 odds: $2^49$ ways
+*Part b: Odd \# of evens AND even \# of odds*
+- Odd \# from 49 evens: $2^48$ ways
+- Even \# from 50 odds: $2^49$ ways
 - Total: $2^48 times 2^49 = 2^97$
 - *Answer:* $2^97$ (NOT "None of these"!)
 
@@ -2393,8 +2394,8 @@ $ phi(p q) = (p-1)(q-1) = p q - p - q + 1 $
 - This is NOT $2^49$ or any other listed option
 - *Answer:* None of these (Option 5)
 
-*Part d: Odd # of odd numbers*
-- Odd # from 50 odds: $2^49$ ways
+*Part d: Odd \# of odd numbers*
+- Odd \# from 50 odds: $2^49$ ways
 - Any subset of 49 evens: $2^49$ ways
 - Total: $2^49 times 2^49 = 2^98$
 - *Answer:* $2^98$
@@ -2600,15 +2601,16 @@ $ a_n = cases(a_(n-1) + n & "if" n "even", a_(n-1) + 2a_(n-2) & "if" n "odd") $
   *Key:* Mathematical statements CAN be translated to predicate logic. Don't give up!
 ]
 
-#example(title: [2025 Q11: "Every positive rational has coprime representation"])
+#example(
+  title: [2025 Q11: "Every positive rational has coprime representation"],
 )[
-*Statement:* For every positive rational $x$, there exist positive integers $a, b$ such that $x = a/b$ and $gcd(a, b) = 1$.
+  *Statement:* For every positive rational $x$, there exist positive integers $a, b$ such that $x = a/b$ and $gcd(a, b) = 1$.
 
-*Translation:* $forall x in QQ^+ exists a in ZZ^+ exists b in ZZ^+ (x = a/b and G(a,b))$
+  *Translation:* $forall x in QQ^+ exists a in ZZ^+ exists b in ZZ^+ (x = a/b and G(a,b))$
 
-This is exactly Option 2!
+  This is exactly Option 2!
 
-*Answer:* Option 2
+  *Answer:* Option 2
 ]
 
 == Set Algebra (2025 Q12)
