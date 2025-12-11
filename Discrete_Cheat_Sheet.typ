@@ -2296,6 +2296,575 @@ Check if functions are injective/surjective/bijective on finite domains:
 
 #pagebreak()
 
+= 2025 Exam Examples with SymPy & Mathematica Code
+
+#rect(inset: 12pt, fill: red.lighten(85%), width: 100%)[
+*COMMON MISTAKES TO AVOID:*
+- Always put the POLYNOMIAL inside `Coefficient[]`, not the monomial you're looking for!
+- Wrong: `Coefficient[Expand[x^15 y^20], ...]` ← This just gives you `x^15 y^20`
+- Right: `Coefficient[Expand[(2x^3 - y^4)^10], x^15 y^20]`
+]
+
+== Euler's Totient Function (2025 Q1)
+
+#rect(inset: 8pt, fill: yellow.lighten(85%), width: 100%)[
+  *Formula:* For distinct primes $p, q$: $phi(p q) = (p-1)(q-1) = p q - p - q + 1$
+]
+
+#example(
+  title: [2025 Q1: φ(pq) for primes p < q],
+)[
+*Question:* If $p,q$ are primes with $100 < p < q$, how many positive integers less than $p q$ are relatively prime to $p q$?
+
+*Solution:* This is Euler's totient function!
+$ phi(p q) = (p-1)(q-1) = p q - p - q + 1 $
+
+*SymPy:*
+```python
+  from sympy import symbols, expand
+  p, q = symbols('p q')
+  phi_pq = (p - 1) * (q - 1)
+  print(expand(phi_pq))  # p*q - p - q + 1
+  ```
+
+*Mathematica:*
+```mathematica
+  Expand[(p - 1)(q - 1)]  (* p q - p - q + 1 *)
+  EulerPhi[101 * 103]     (* Verify with specific primes: 10200 *)
+  (101-1)*(103-1)         (* 10200 ✓ *)
+  ```
+
+*Answer:* $p q - p - q + 1$ (Option 1)
+]
+
+== Modular Exponentiation (2025 Q2)
+
+#example(title: [2025 Q2: $(4^100 mod 6)^100 mod 10$])[
+*Step-by-step:*
+1. First: $4^100 mod 6$
+2. Then: $(text("result"))^100 mod 10$
+
+*SymPy:*
+```python
+  step1 = pow(4, 100, 6)   # 4
+  step2 = pow(step1, 100, 10)  # 6
+  print(f"Answer: {step2}")  # 6
+  ```
+
+*Mathematica:*
+```mathematica
+  PowerMod[4, 100, 6]      (* 4 *)
+  PowerMod[4, 100, 10]     (* 6 *)
+  ```
+
+*Answer:* 6 (Option 2)
+]
+
+== Subset Counting with Parity Constraints (2025 Q3)
+
+#rect(
+  inset: 8pt,
+  fill: yellow.lighten(85%),
+  width: 100%,
+)[
+  *Key Insight:* In a set of $n$ elements, exactly half the subsets have an odd number of elements, half have even.
+
+  For $n$ odd elements: $2^(n-1)$ subsets with odd count, $2^(n-1)$ with even count.
+
+  For $n$ even elements: $2^(n-1)$ subsets with odd count, $2^(n-1)$ with even count.
+]
+
+#example(title: [2025 Q3: Subsets of {1,...,99}])[
+*Setup:* {1,...,99} has 50 odd numbers and 49 even numbers.
+
+*Part a: Odd \# of odds AND even \# of evens*
+- Odd \# from 50 odds: $2^(50-1) = 2^49$ ways
+- Even \# from 49 evens: $2^(49-1) = 2^48$ ways
+- Total: $2^49 times 2^48 = 2^97$
+- *Answer:* $2^97$
+
+*Part b: Odd \# of evens AND even \# of odds*
+- Odd \# from 49 evens: $2^48$ ways
+- Even \# from 50 odds: $2^49$ ways
+- Total: $2^48 times 2^49 = 2^97$
+- *Answer:* $2^97$ (NOT "None of these"!)
+
+*Part c: Subsets with 49 elements*
+- Simply $binom(99, 49)$
+- This is NOT $2^49$ or any other listed option
+- *Answer:* None of these (Option 5)
+
+*Part d: Odd \# of odd numbers*
+- Odd \# from 50 odds: $2^49$ ways
+- Any subset of 49 evens: $2^49$ ways
+- Total: $2^49 times 2^49 = 2^98$
+- *Answer:* $2^98$
+
+*SymPy:*
+```python
+  from math import comb
+  # Part c verification
+  print(comb(99, 49))  # 4.96e28, not 2^49 = 5.6e14
+  print(2**49)  # 562949953421312
+  ```
+]
+
+== Chinese Remainder Theorem (2025 Q4)
+
+#example(title: [2025 Q4: Solve system of congruences])[
+*System:*
+$ x &equiv 1 pmod(2) \
+x &equiv 1 pmod(5) \
+x &equiv 7 pmod(9) $
+
+*SymPy:*
+```python
+  from sympy.ntheory.modular import solve_congruence
+  result = solve_congruence((1, 2), (1, 5), (7, 9))
+  print(result)  # (61, 90)
+  # Answer: x ≡ 61 (mod 90)
+  ```
+
+*Mathematica:*
+```mathematica
+  ChineseRemainder[{1, 1, 7}, {2, 5, 9}]  (* 61 *)
+  LCM[2, 5, 9]  (* 90 *)
+  ```
+
+*Verify:* $61 mod 2 = 1$ ✓, $61 mod 5 = 1$ ✓, $61 mod 9 = 7$ ✓
+
+*Answer:* ${61 + 90k | k in ZZ}$ (Option 5)
+]
+
+== Polynomial GCD (2025 Q5)
+
+#example(title: [2025 Q5: GCD of $x^3 - 1$ and $x^3 + 2x^2 + 2x + 1$])[
+*SymPy:*
+```python
+  from sympy import Symbol, gcd, factor
+  x = Symbol('x')
+  p1 = x**3 - 1
+  p2 = x**3 + 2*x**2 + 2*x + 1
+  print(factor(p1))  # (x - 1)*(x**2 + x + 1)
+  print(factor(p2))  # (x + 1)*(x**2 + x + 1)
+  print(gcd(p1, p2))  # x**2 + x + 1
+  ```
+
+*Mathematica:*
+```mathematica
+  Factor[x^3 - 1]              (* (x-1)(x^2+x+1) *)
+  Factor[x^3 + 2x^2 + 2x + 1]  (* (x+1)(x^2+x+1) *)
+  PolynomialGCD[x^3 - 1, x^3 + 2x^2 + 2x + 1]  (* x^2 + x + 1 *)
+  ```
+
+*Answer:* $x^2 + x + 1$ (Option 4)
+]
+
+== Induction Proof Structure (2025 Q6)
+
+#rect(inset: 8pt, fill: yellow.lighten(85%), width: 100%)[
+  *Standard Induction Proof Order:*
+  1. *Base case* (usually $n = 0$ for statements about $NN$)
+  2. *Induction hypothesis*: Assume $P(n)$ holds for SOME $n$
+  3. *Induction step*: Prove $P(n+1)$ using the hypothesis
+  4. *Conclusion*: Invoke principle of mathematical induction
+]
+
+#example(title: [2025 Q6: Prove $f(n) = (n+1)! - 1$])[
+  *Statement:* $f(n) = sum_(k=0)^n k dot k! = (n+1)! - 1$
+
+  *Correct fragment order:*
+  1. *F* - Base case $n=0$: $f(0) = 0$ and $(0+1)! - 1 = 0$ ✓
+  2. *B* - Assume $f(n) = (n+1)! - 1$ for SOME $n$ (not all!)
+  3. *H* - Prove $f(n+1)$ by adding $(n+1)(n+1)!$ to $f(n)$
+  4. *D* - Conclusion: statement follows by induction
+
+  *Common mistakes:*
+  - Using $n=1$ as base when $n=0$ is in domain
+  - Assuming formula for ALL $n$ (circular reasoning)
+  - Working backwards instead of forwards
+
+  *Answer:* F, B, H, D
+]
+
+== Recursive Sequence (2025 Q7)
+
+#example(title: [2025 Q7: Compute $a_n$])[
+*Recurrence:*
+$ a_0 = 2, quad a_1 = 3 $
+$ a_n = cases(a_(n-1) + n & "if" n "even", a_(n-1) + 2a_(n-2) & "if" n "odd") $
+
+*SymPy:*
+```python
+  a = [0] * 10
+  a[0], a[1] = 2, 3
+  for n in range(2, 10):
+      if n % 2 == 0:
+          a[n] = a[n-1] + n
+      else:
+          a[n] = a[n-1] + 2*a[n-2]
+  print(a)  # [2, 3, 5, 11, 15, 37, 43, 117, ...]
+  # a_5 = 37
+  ```
+
+*Answer:* 37 (Option 1)
+]
+
+== Bipartite Graph Degree Sequences (2025 Q8)
+
+#rect(
+  inset: 8pt,
+  fill: red.lighten(85%),
+  width: 100%,
+)[
+  *CRITICAL:* In a bipartite graph, the sum of degrees on BOTH sides must be EQUAL (both equal the number of edges).
+]
+
+#example(title: [2025 Q8: Bipartite graph existence])[
+*Part a:* $V_1 = [4,4,4,4]$, $V_2 = [5,5,5,5,5]$
+- Sum of $V_1$: $16$, Sum of $V_2$: $25$
+- $16 != 25$ → *Graph does NOT exist*
+- *Answer:* None of these (Option 5)
+
+*Part b:* $V_1 = [1,2,2,2]$, $V_2 = [1,2,2,2,2]$
+- Sum of $V_1$: $7$, Sum of $V_2$: $9$
+- $7 != 9$ → *Graph does NOT exist*
+- *Answer:* None of these (Option 5)
+
+*Part c:* $V_1 = [5,5,5,5]$, $V_2 = [4,4,4,4,4]$
+- Sum of $V_1$: $20$, Sum of $V_2$: $20$ ✓
+- Max degree in $V_1$ is 5 = $|V_2|$: each must connect to all of $V_2$
+- Max degree in $V_2$ is 4 = $|V_1|$: each connects to all of $V_1$
+- *This works!* Graph exists without multiple edges.
+- *Answer:* Option 1
+
+*SymPy:*
+```python
+  V1 = [5,5,5,5]
+  V2 = [4,4,4,4,4]
+  print(f"Sum V1: {sum(V1)}, Sum V2: {sum(V2)}")
+  print(f"Equal: {sum(V1) == sum(V2)}")  # True
+  ```
+]
+
+== Vandermonde's Identity (2025 Q9)
+
+#rect(inset: 8pt, fill: yellow.lighten(85%), width: 100%)[
+  *Vandermonde:* $binom(m+n, r) = sum_(k=0)^r binom(m, r-k) binom(n, k)$
+
+  *Non-zero terms:* $max(0, r-m) <= k <= min(r, n)$
+]
+
+#example(title: [2025 Q9: Lower bound of summation])[
+  *Given:* $0 < m < r < n$
+
+  For $binom(m, r-k)$ to be non-zero: $0 <= r-k <= m$, i.e., $r-m <= k <= r$
+
+  For $binom(n, k)$ to be non-zero: $0 <= k <= n$
+
+  Combined: $max(0, r-m) <= k <= min(r, n)$
+
+  Since $r > m > 0$, we have $r - m > 0$, so lower bound is $r - m$.
+
+  *Answer:* $a = r - m$ (Option 6)
+]
+
+== Set Operations (2025 Q10)
+
+#example(title: [2025 Q10: $((A sect B) backslash C) union ((B sect C) backslash A) union ((C sect A) backslash B)$])[
+*Given:* $A = {0,1,2,4}$, $B = {0,1,3,5}$, $C = {0,2,3,6}$
+
+*SymPy:*
+```python
+  A = {0,1,2,4}
+  B = {0,1,3,5}
+  C = {0,2,3,6}
+  result = ((A & B) - C) | ((B & C) - A) | ((C & A) - B)
+  print(result)  # {1, 2, 3}
+  ```
+
+*Step by step:*
+- $A sect B = {0, 1}$
+- $B sect C = {0, 3}$
+- $C sect A = {0, 2}$
+- $(A sect B) backslash C = {1}$
+- $(B sect C) backslash A = {3}$
+- $(C sect A) backslash B = {2}$
+- Union: ${1, 2, 3}$
+
+*Answer:* ${1, 2, 3}$ (Option 7)
+]
+
+== Predicate Logic Translation (2025 Q11)
+
+#rect(inset: 8pt, fill: red.lighten(85%), width: 100%)[
+  *Key:* Mathematical statements CAN be translated to predicate logic. Don't give up!
+]
+
+#example(
+  title: [2025 Q11: "Every positive rational has coprime representation"],
+)[
+  *Statement:* For every positive rational $x$, there exist positive integers $a, b$ such that $x = a/b$ and $gcd(a, b) = 1$.
+
+  *Translation:* $forall x in QQ^+ exists a in ZZ^+ exists b in ZZ^+ (x = a/b and G(a,b))$
+
+  This is exactly Option 2!
+
+  *Answer:* Option 2
+]
+
+== Set Algebra (2025 Q12)
+
+#example(title: [2025 Q12: $A sect overline((B backslash C))$])[
+  *Simplify:*
+  $ A sect overline((B backslash C)) &= A sect overline((B sect overline(C))) \
+                                   &= A sect (overline(B) union C) quad "(De Morgan)" \
+                                   &= (A sect overline(B)) union (A sect C) quad "(Distributive)" $
+
+  *Answer:* $(A sect overline(B)) union (A sect C)$ (Option 4)
+
+  *NOT* $A sect (C backslash B)$ which equals $A sect C sect overline(B)$
+]
+
+== Tautologies (2025 Q14)
+
+#example(title: [2025 Q14: Which is a tautology?])[
+*SymPy:*
+```python
+  from itertools import product
+
+  def check(f):
+      return all(f(p,q,r) for p,q,r in product([True,False], repeat=3))
+
+  # Option 1: (p→q) ∨ (¬q→¬p)
+  opt1 = lambda p,q,r: ((not p) or q) or (q or (not p))
+  print(f"Option 1: {check(opt1)}")  # False!
+
+  # Option 5: (¬p∨¬q) → ¬(p∧q)
+  opt5 = lambda p,q,r: (not ((not p) or (not q))) or (not (p and q))
+  print(f"Option 5: {check(opt5)}")  # True!
+  ```
+
+*Analysis:*
+- Option 1: $(p -> q) or (not q -> not p)$ — NOT a tautology! When $p=T, q=F$: $(F) or (T -> F) = F or F = F$
+- Option 5: $(not p or not q) -> not(p and q)$ — This is $(not(p and q)) -> (not(p and q))$, always true!
+
+*Answer:* Option 5: $(not p or not q) -> not(p and q)$
+]
+
+== Circular Permutations (2025 Q15)
+
+#rect(inset: 8pt, fill: yellow.lighten(85%), width: 100%)[
+  *Circular arrangements of $n$ people:*
+  - Oriented (left/right matters): $(n-1)!$
+  - Unoriented (only neighbors matter): $(n-1)!/2$
+]
+
+#example(title: [2025 Q15: Two tables with n and 2n seats])[
+*Setup:* $3n$ people, tables with $n$ and $2n$ seats.
+
+*Part a: Same left AND right neighbors*
+- Choose $n$ for small table: $binom(3n, n)$
+- Arrange at small table (oriented): $(n-1)!$
+- Arrange at large table (oriented): $(2n-1)!$
+- Total: $binom(3n, n) (n-1)! (2n-1)! = (3n)!/(2n^2)$
+- *Answer:* $(3n)!/(2n^2)$ (Option 5)
+
+*Part b: Same neighbors (don't care left/right)*
+- Divide by 2 for each table (orientation)
+- Total: $(3n)!/(2n^2) times 1/2 times 1/2 = (3n)!/(4n^2)$
+- *Answer:* $(3n)!/(4n^2)$ (Option 6)
+
+*SymPy verification with n=2:*
+```python
+  from math import factorial, comb
+  n = 2
+  part_a = comb(6, 2) * factorial(1) * factorial(3)  # 15*1*6 = 90
+  formula_a = factorial(6) // (2 * n**2)  # 720/8 = 90 ✓
+  ```
+]
+
+== Function Properties (2025 Q16)
+
+#rect(inset: 8pt, fill: red.lighten(85%), width: 100%)[
+  *Check list:*
+  1. *Well-defined:* Every input maps to exactly one output IN THE CODOMAIN
+  2. *Injective:* Different inputs → different outputs
+  3. *Surjective:* Every codomain element is hit
+]
+
+#example(title: [2025 Q16: Function property analysis])[
+  *f: ℝ → ℤ, f(x) = 2⌊x/2⌋*
+  - Well-defined? Yes! Always produces an even integer.
+  - Injective? No: $f(0) = f(1) = 0$
+  - Surjective? No: odd integers never produced
+  - *Answer:* Neither injective nor surjective (Option 2)
+
+  *f: ℝ → {x ≥ 0}, f(x) = √(x²) = |x|*
+  - Well-defined? Yes
+  - Injective? No: $f(1) = f(-1) = 1$
+  - Surjective? Yes! For any $y >= 0$, $f(y) = y$
+  - *Answer:* Surjective (Option 3)
+
+  *f: ℕ → ℕ, f(x) = 2x + 7*
+  - Well-defined? Yes: $2x + 7 >= 7 > 0$ for $x >= 0$
+  - Injective? Yes
+  - Surjective? No: 0,1,2,3,4,5,6 never hit
+  - *Answer:* Injective (Option 4)
+
+  *f: ℕ → ℕ, f(x) = x - x²*
+  - Well-defined? $f(2) = 2 - 4 = -2 in.not NN$
+  - *Answer:* Not well-defined (Option 1)
+
+  *f: ℝ → ℝ, f(x) = x if x ∈ ℚ, -x if x ∉ ℚ*
+  - Injective? Yes (proof by cases)
+  - Surjective? Yes: $f(y) = y$ for rational $y$; $f(-y) = y$ for irrational $y$
+  - *Answer:* Both injective AND surjective (Option 5)
+]
+
+== Permutations with Forbidden Patterns (2025 Q17)
+
+#example(title: [2025 Q17: Permutations of ABCDE])[
+*SymPy (brute force):*
+```python
+  from itertools import permutations
+
+  def has(p, sub):
+      return sub in ''.join(p)
+
+  perms = list(permutations('ABCDE'))
+
+  # Q17a: None of AB, BC, CD
+  count_a = sum(1 for p in perms if not (has(p,'AB') or has(p,'BC') or has(p,'CD')))
+  print(f"Without AB,BC,CD: {count_a}")  # 64
+
+  # Q17b: Contains ACE as substring
+  count_b = sum(1 for p in perms if has(p, 'ACE'))
+  print(f"With ACE: {count_b}")  # 6
+
+  # Q17c: Exactly one of AB, CD
+  count_c = sum(1 for p in perms if has(p,'AB') != has(p,'CD'))
+  print(f"Exactly one of AB,CD: {count_c}")  # 36
+  ```
+
+*Answers:* (a) 64, (b) 6, (c) 36
+]
+
+== Relation Properties (2025 Q18)
+
+#rect(inset: 8pt, fill: yellow.lighten(85%), width: 100%)[
+  *Definitions on set S:*
+  - *Reflexive:* $(a,a) in R$ for all $a in S$
+  - *Symmetric:* $(a,b) in R => (b,a) in R$
+  - *Antisymmetric:* $(a,b) in R and (b,a) in R => a = b$
+  - *Transitive:* $(a,b) in R and (b,c) in R => (a,c) in R$
+  - *Equivalence:* Reflexive + Symmetric + Transitive
+  - *Partial Order:* Reflexive + Antisymmetric + Transitive
+  - *Total Order:* Partial order where any two elements are comparable
+  - *Well-Order:* Total order where every non-empty subset has minimum
+  - *Hasse Diagram Edges:* Covering relations of a partial order (not the full order!)
+]
+
+#example(title: [2025 Q18: Classify relations on {a,b,c,d}])[
+  *R₁ = {(a,a),(a,b),(a,c),(a,d)}*
+  - Not reflexive (missing (b,b), (c,c), (d,d))
+  - *Answer:* None of these (Option 5)
+
+  *R₂ = {(a,b),(b,c),(c,d)}*
+  - Not reflexive, but these ARE the covering relations
+  - If we add reflexive closure and transitive closure, we get $a < b < c < d$
+  - *Answer:* Hasse diagram edges (Option 1)
+
+  *R₃ = {(a,a),(b,b),(c,c),(d,d),(a,d),(d,a)}*
+  - Reflexive ✓, Symmetric ✓, Transitive ✓
+  - *Answer:* Equivalence relation (Option 7)
+
+  *R₄ = {(a,a),(b,b),(c,c),(d,d),(d,c)}*
+  - Reflexive ✓, Antisymmetric ✓, Transitive ✓
+  - But NOT total: $a$ and $b$ are incomparable
+  - *Answer:* Partial order (Option 2)
+
+  *R₅ = {(a,a),...,(d,d),(a,b),(a,c),(a,d),(b,c),(b,d),(c,d)}*
+  - This is $<=$ on $a < b < c < d$
+  - Partial order ✓, Total ✓, Well-ordered ✓
+  - *Answer:* Well-order (Option 4)
+]
+
+== Polynomial Coefficients (2025 Q20) — CRITICAL!
+
+#rect(inset: 12pt, fill: red.lighten(85%), width: 100%)[
+*COMMON WOLFRAM MISTAKE:*
+```mathematica
+  (* WRONG - this expands the monomial, not the polynomial! *)
+  Coefficient[Expand[x^15 y^20], (2x^3 - y^4)^10]
+
+  (* CORRECT - expand the polynomial, find coefficient of monomial *)
+  Coefficient[Expand[(2x^3 - y^4)^10], x^15 y^20]
+  ```
+]
+
+#example(title: [2025 Q20: Coefficient of $x^15 y^20$])[
+*General approach:* $(a x^m + b y^n)^N$ has term $binom(N, k) a^(N-k) b^k x^(m(N-k)) y^(n k)$
+
+*$(2x^3 - y^4)^10$:*
+- Term: $binom(10, k) (2x^3)^(10-k) (-y^4)^k = binom(10, k) 2^(10-k) (-1)^k x^(3(10-k)) y^(4k)$
+- For $x^15$: $3(10-k) = 15 => k = 5$
+- For $y^20$: $4k = 20 => k = 5$ ✓
+- Coefficient: $binom(10, 5) dot 2^5 dot (-1)^5 = 252 dot 32 dot (-1) = -8064$
+- $= -binom(10, 5) dot 2^5$
+
+*SymPy:*
+```python
+  from sympy import symbols, expand, Poly
+  x, y = symbols('x y')
+
+  # Method 1: expand and extract
+  p1 = expand((2*x**3 - y**4)**10)
+  coef1 = Poly(p1, x, y).coeff_monomial(x**15 * y**20)
+  print(coef1)  # -8064
+
+  # Method 2: direct coefficient
+  from sympy import binomial
+  k = 5  # solved from exponent equations
+  coef = binomial(10, k) * 2**(10-k) * (-1)**k
+  print(coef)  # -8064
+  ```
+
+*Mathematica (CORRECT SYNTAX):*
+```mathematica
+  (* For (2x^3 - y^4)^10 *)
+  Coefficient[Expand[(2x^3 - y^4)^10], x^15 y^20]   (* -8064 *)
+
+  (* For (1 - 2x^3 y^4)^10 *)
+  Coefficient[Expand[(1 - 2x^3 y^4)^10], x^15 y^20] (* -8064 *)
+
+  (* For (x^3 - 2y^4)^10 *)
+  Coefficient[Expand[(x^3 - 2y^4)^10], x^15 y^20]   (* -8064 *)
+
+  (* All three equal -Binomial[10,5] * 2^5 = -8064 *)
+  -Binomial[10, 5] * 2^5  (* -8064 ✓ *)
+  ```
+
+*Answer for all three:* $-binom(10, 5) dot 2^5$ (Option 1)
+]
+
+== Logical Equivalence (2025 Q21)
+
+#example(title: [2025 Q21: "$a$ and $b$ are relatively prime"])[
+  *Statement:* $gcd(a, b) = 1$, i.e., no common divisor $> 1$
+
+  *Three equivalent formulations:*
+  1. $forall c ((c | a and c | b) -> c <= 1)$ — Option 5
+  2. $not(exists c (c | a and c | b and c > 1))$ — Option 2
+  3. $forall c (not(c | a) or not(c | b) or c <= 1)$ — Option 3
+
+  These are ALL equivalent by De Morgan's laws and logical transformations!
+
+  *Answer:* All three are equivalent (Option 4)
+]
+
+#pagebreak()
+
 = Wolfram Mathematica Complete Reference
 
 #rect(inset: 8pt, fill: orange.lighten(85%), width: 100%)[
@@ -2351,21 +2920,50 @@ Subsets[{1, 2, 3, 4}, {2}]           (* All 2-element subsets *)
 
 == Polynomial Operations
 
+#rect(inset: 8pt, fill: red.lighten(85%), width: 100%)[
+*⚠️ CRITICAL: Coefficient Syntax*
+
+*WRONG:* `Coefficient[Expand[x^15 y^20], (2x^3 - y^4)^10]`
+- This expands `x^15 y^20` (which is just itself) and finds nothing!
+
+*CORRECT:* `Coefficient[Expand[(2x^3 - y^4)^10], x^15 y^20]`
+- First argument: the POLYNOMIAL you're expanding
+- Second argument: the MONOMIAL whose coefficient you want
+]
+
 ```mathematica
 (* === Expansion === *)
 Expand[(2x^2 - 3y^3)^8]
 
-(* === Extract Coefficient === *)
+(* === Extract Coefficient - CORRECT SYNTAX === *)
+(* Coefficient[POLYNOMIAL, MONOMIAL] *)
 Coefficient[Expand[(2x^2 - 3y^3)^8], x^8 y^12]   (* 90720 *)
+Coefficient[(2x^3 - y^4)^10, x^15 y^20]          (* -8064 — works without Expand too! *)
+
+(* === Multiple examples from 2025 exam === *)
+Coefficient[Expand[(2x^3 - y^4)^10], x^15 y^20]     (* -8064 = -Binomial[10,5]*2^5 *)
+Coefficient[Expand[(1 - 2x^3 y^4)^10], x^15 y^20]   (* -8064 *)
+Coefficient[Expand[(x^3 - 2y^4)^10], x^15 y^20]     (* -8064 *)
 
 (* === Polynomial Division === *)
 PolynomialQuotientRemainder[x^4 + 3x^3 + 5x/2 + 6, x + 2, x]
 
 (* === Divisibility Check === *)
 PolynomialRemainder[x^5 + 1, x + 1, x]   (* 0 means divisible *)
+
+(* === Polynomial GCD === *)
+PolynomialGCD[x^3 - 1, x^3 + 2x^2 + 2x + 1]  (* x^2 + x + 1 *)
+Factor[x^3 - 1]                               (* (x-1)(x^2+x+1) *)
 ```
 
 == Graph Theory Calculations
+
+#rect(inset: 8pt, fill: red.lighten(85%), width: 100%)[
+  *⚠️ BIPARTITE GRAPH CHECK:* In a bipartite graph with parts $V_1$ and $V_2$:
+  - Sum of degrees in $V_1$ MUST equal sum of degrees in $V_2$
+  - Both sums equal the number of edges
+  - If sums don't match, the graph CANNOT exist!
+]
 
 ```mathematica
 (* === Hypercube Q_n === *)
@@ -2379,6 +2977,18 @@ completeEdges[n_] := n(n-1)/2
 degreeSequence = {2, 2, 3, 3, 3, 3, 3};
 Total[degreeSequence]                (* 19 - odd, so invalid! *)
 EvenQ[Total[degreeSequence]]         (* False *)
+
+(* === Bipartite Graph Degree Check (2025 Exam!) === *)
+V1 = {4, 4, 4, 4};
+V2 = {5, 5, 5, 5, 5};
+Total[V1]                            (* 16 *)
+Total[V2]                            (* 25 *)
+Total[V1] == Total[V2]               (* False - graph CANNOT exist! *)
+
+(* Example that DOES work *)
+V1good = {5, 5, 5, 5};
+V2good = {4, 4, 4, 4, 4};
+Total[V1good] == Total[V2good]       (* True - 20 = 20, may exist *)
 ```
 
 == Inclusion-Exclusion Templates
